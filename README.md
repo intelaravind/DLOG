@@ -1,7 +1,7 @@
-MDEBG
+DLOG
 =====
 
-MDEBG LLVM version
+DLOG LLVM version
 
 
 Logging and Debugging are essential parts of software development. There are a ton of tools for logging out there in the market. But most of them do lack the ability to handle large projects, or lacks the ability to properly organize the logs. Moreover the output is usually not readable and is not colourised. Wesolve all these problems. Most of the loggers are designed for a single system not for a distributed.
