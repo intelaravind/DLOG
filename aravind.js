@@ -34,7 +34,7 @@ function toggle_chk_false(source) {
 function toggle_hideme(name)
 {
 
-	var hellos = getElementsByClass(name, null, "div");
+	var hellos = getElementsByClass(name, null);
 
 	var nodeList = document.getElementsByClassName(name);
 
@@ -44,7 +44,7 @@ function toggle_hideme(name)
 
 	if(e.style.display == 'none')
 	{
-		newDisplay = 'block';
+		newDisplay = 'inline';
 	}
 	else
 	{

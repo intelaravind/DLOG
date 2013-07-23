@@ -18,7 +18,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <typeinfo>
-#include "includellvm.h"
+//#include "includellvm.h"
 
 std::string mendl = "<br>\n";
 std::string br = "<br>";
@@ -36,7 +36,7 @@ std::string br = "<br>";
 #define EDIV "</div>\n"
 #define ESPAN "</span>\n"
 #define NBSP "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-#define CALLINFO "<span class='CALLINFO' id='CALLINFO' >"<<RED(userfile)<<":"<<RED(lineno)<<"</span>\n"
+#define CALLINFO "<span class='CALLINFO' id='CALLINFO' style=\"font-size:12px\">"<<NBSP<<RED(userfile)<<":"<<RED(lineno)<<"</span>\n"
 
 class ADDON
 {
@@ -109,26 +109,6 @@ class aravdebug
 	llvm::OwningPtr<llvm::raw_ostream> OS;
 
 public:
-//	aravdebug()
-//	{
-//
-//		dataPath = "~/ostream.html";
-//		datatempPath = dataPath + ".temp";
-////		tagPath = dataPath + ".tag";
-//
-//		system("rm -f ~/ostream.html");
-//		OS.reset(
-//				(new llvm::raw_fd_ostream(datatempPath.c_str(), ErrorInfo,
-//						llvm::raw_fd_ostream::F_Append)));
-//
-//		id = ++gid;
-//
-//		//llvm::errs()<<"id "<<id<<"\n";
-//		tagset.insert("SYSTEM");
-//		(*OS) << DIV("SYSTEM") << "Created Debugger " << GREEN(id) << EDIV;
-//
-//		(*OS).flush();
-//	}
 
 	aravdebug(const char * userfile, int lineno, const char *PATH)
 	{
@@ -140,31 +120,21 @@ public:
 		std::string syscall = "rm -f " + dataPath;
 
 		system(syscall.c_str());
+
 		OS.reset(
-				(new llvm::raw_fd_ostream(datatempPath.c_str(), ErrorInfo,
-						llvm::raw_fd_ostream::F_Append)));
+				(new llvm::raw_fd_ostream(datatempPath.c_str(), ErrorInfo
+						)));
 
-		/*		if (filemode == FILE_NEW)
-		 {
-		 system("rm PATH");
-		 OS.reset(
-		 (new llvm::raw_fd_ostream(datatempPath, ErrorInfo,
-		 llvm::raw_fd_ostream::F_Append)));
-		 }
-		 else
-		 {
-		 OS.reset(NULL);
-		 OS.reset(
-		 (new llvm::raw_fd_ostream(datatempPath, ErrorInfo,
-		 llvm::raw_fd_ostream::F_Append)));
+		llvm::errs() <<ErrorInfo;
 
-		 }*/
 		id = gid++;
 
-		//llvm::errs()<<"id "<<id<<"\n";
+		//llvm::errs()<<"created DLOG with id "<<id<<"\n";
 		tagset.insert("SYSTEM");
 		(*OS) << DIV("SYSTEM") << "Created Debugger " << GREEN(id) << CALLINFO
 				<< EDIV;
+
+		tagset.insert("CALLINFO");
 
 		(*OS).flush();
 	}
@@ -174,14 +144,14 @@ public:
 
 
 
-		errs()<<"Datapath "<<dataPath.c_str()<<"\n";
-		errs()<<"datatempPath "<<datatempPath.c_str()<<"\n";
+		//llvm::errs()<<"Datapath "<<dataPath.c_str()<<"\n";
+		//llvm::errs()<<"datatempPath "<<datatempPath.c_str()<<"\n";
 
 		std::fstream fwrite;
 		fwrite.open(dataPath.c_str(), std::fstream::out);
 
 		fwrite
-				<< "<head> <script type='text/javascript' src='aravind.js' ></script> </head> <body> <style>div.floating-menu {position:fixed;background:#fff4c8;border:1px solid #ffcc00;width:150px;z-index:100; left:70%;top:150px;} div.floating-menu a, div.floating-menu h3 {display:block;margin:0 0.5em;} </style>";
+				<< "<head> <script type='text/javascript' src='aravind.js' ></script> </head> <body> <style>div.floating-menu {position:fixed;background:#fff4c8;border:1px solid #ffcc00;width:150px;z-index:100; left:70%;top:150px;} div.floating-menu a, div.floating-menu h3 {display:block;margin:0 0.5em;} </style>\n";
 
 		fwrite << DIV("floating-menu");
 		for (auto it = tagset.begin(); it != tagset.end(); ++it)
@@ -211,7 +181,7 @@ public:
 		std::string syscommand = "cat " + datatempPath
 				+ " >> "+dataPath;
 
-		errs()<<syscommand;
+		//llvm::errs()<<syscommand;
 
 		system(syscommand.c_str());
 
@@ -219,43 +189,45 @@ public:
 		system(syscommand.c_str());
 
 		unsigned found = datatempPath.find_last_of("/\\");
-		syscommand = "cp aravind.js " + datatempPath.substr(0,found);
+		syscommand = "cp projects/DLOG/aravind.js " + datatempPath.substr(0,found);
 		system(syscommand.c_str());
 
-		system("echo `pwd`");
+		//system("echo `pwd`");
 
 
 	}
 
-	template<typename T, typename F>
-	void graph_save(T &tag, F &fun, std::string s = "", ADDON addon = ADDON())
-	{
-
-		std::string Filename = "/home/nfs/aravind/graph" + llvm::itostr(gid)
-				+ "cfg" + ".dot";
-
-		std::string ErrorInfo;
-		llvm::raw_fd_ostream File(Filename.c_str(), ErrorInfo);
-		if (ErrorInfo.empty())
-		{
-			WriteGraph(File, (const llvm::Function*) &fun, true, "test");
-			ViewGraph(&fun, "cfg:" + llvm::itostr(gid));
-		}
-		else
-		{
-			llvm::errs() << "  error opening file for writing!";
-		}
-
-		llvm::errs() << ErrorInfo;
-		gid++;
-
-	}
+//	template<typename T, typename F>
+//	void graph_save(T &tag, F &fun, std::string s = "", ADDON addon = ADDON())
+//	{
+//
+//		std::string Filename = "/home/nfs/aravind/graph" + llvm::itostr(gid)
+//				+ "cfg" + ".dot";
+//
+//		std::string ErrorInfo;
+//		llvm::raw_fd_ostream File(Filename.c_str(), ErrorInfo);
+//		if (ErrorInfo.empty())
+//		{
+//			WriteGraph(File, (const llvm::Function*) &fun, true, "test");
+//			ViewGraph(&fun, "cfg:" + llvm::itostr(gid));
+//		}
+//		else
+//		{
+//			llvm::errs() << "  error opening file for writing!";
+//		}
+//
+//		llvm::errs() << ErrorInfo;
+//		gid++;
+//
+//	}
 
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, const char* tag,
 			T* obj)
 	{
 		std::string msg;
+
+		llvm::errs()<<"I am called in line no"<<__LINE__;
 
 		llvm::raw_string_ostream Msg(msg);
 		Msg << obj;
