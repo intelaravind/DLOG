@@ -44,7 +44,7 @@ function toggle_hideme(name)
 
 	if(e.style.display == 'none')
 	{
-		newDisplay = 'inline';
+		newDisplay = 'block';
 	}
 	else
 	{
@@ -55,20 +55,25 @@ function toggle_hideme(name)
 	{
 
 		hellos[i].style.display = newDisplay;
+		if(hellos[i].nodeName == 'SPAN' && newDisplay == 'block')
+			hellos[i].style.display = 'inline';
 	}
 }
 
 function toggle_hideme2(name,status)
 {
 
-	var hellos = getElementsByClass(name, null, "div");
+	var hellos = getElementsByClass(name, null);
 
 	var nodeList = document.getElementsByClassName(name);
 
 	
 	for(var i = 0; i < hellos.length; i++)
 	{
-
 		hellos[i].style.display = status;
+		if(hellos[i].nodeName == 'SPAN' && status == 'block')
+			hellos[i].style.display = 'inline';
+
+
 	}
 }
