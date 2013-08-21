@@ -113,7 +113,9 @@ public:
 	aravdebug(const char * userfile, int lineno, const char *PATH)
 	{
 
-		dataPath = std::string(PATH);
+		dataPath = getenv("DLOG_OUTPUT_FOLDER") + std::string(PATH);
+
+		//llvm::errs()<<"Data path ::"<<dataPath;
 		datatempPath = dataPath + ".temp";
 //		tagPath = dataPath + ".tag";
 
@@ -121,11 +123,9 @@ public:
 
 		system(syscall.c_str());
 
-		OS.reset(
-				(new llvm::raw_fd_ostream(datatempPath.c_str(), ErrorInfo
-						)));
+		OS.reset((new llvm::raw_fd_ostream(datatempPath.c_str(), ErrorInfo)));
 
-		llvm::errs() <<ErrorInfo;
+		llvm::errs() << ErrorInfo;
 
 		id = gid++;
 
@@ -141,8 +141,6 @@ public:
 
 	~aravdebug()
 	{
-
-
 
 		//llvm::errs()<<"Datapath "<<dataPath.c_str()<<"\n";
 		//llvm::errs()<<"datatempPath "<<datatempPath.c_str()<<"\n";
@@ -173,27 +171,27 @@ public:
 		fwrite << "</body> </html>";
 		fwrite.close();
 
-		if (!system(NULL))
+		if (!system(NULL ))
 			(*OS) << RED("System command failed in debugger\n");
 
-		OS.reset(NULL);
+		OS.reset(NULL );
 
-		std::string syscommand = "cat " + datatempPath
-				+ " >> "+dataPath;
+		std::string syscommand = "cat " + datatempPath + " >> " + dataPath;
 
 		//llvm::errs()<<syscommand;
 
 		system(syscommand.c_str());
 
-		syscommand = "rm -f "+ datatempPath;
+		syscommand = "rm -f " + datatempPath;
 		system(syscommand.c_str());
 
 		unsigned found = datatempPath.find_last_of("/\\");
-		syscommand = "cp projects/DLOG/aravind.js " + datatempPath.substr(0,found);
+
+		syscommand = "cp $DLOG_PATH/aravind.js "
+				+ datatempPath.substr(0, found);
 		system(syscommand.c_str());
 
-		//system("echo `pwd`");
-
+		system("echo `pwd`");
 
 	}
 
@@ -227,7 +225,7 @@ public:
 	{
 		std::string msg;
 
-		llvm::errs()<<"I am called in line no"<<__LINE__;
+		//llvm::errs()<<"I am called in line no"<<__LINE__;
 
 		llvm::raw_string_ostream Msg(msg);
 		Msg << obj;
@@ -241,8 +239,8 @@ public:
 	}
 
 	template<typename T>
-	void print_to_file(const char * userfile, int lineno, T obj,
-			ADDON addon = ADDON())
+	void print_to_file(const char * userfile, int lineno, T obj, ADDON addon =
+			ADDON())
 	{
 
 		tagset.insert("notag");
