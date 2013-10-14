@@ -191,7 +191,7 @@ public:
 				+ datatempPath.substr(0, found);
 		system(syscommand.c_str());
 
-		system("echo `pwd`");
+		//system("echo `pwd`");
 
 	}
 

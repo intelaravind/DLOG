@@ -12,7 +12,7 @@
 
 #include "mydebug.hpp"
 
-//#define DEBUG
+//#define DLOG_DEBUG
 
 #define MDEBG_CREATE(path)  DLOG(__FILE__,__LINE__,path)
 #define PRINT_TO_FILE(...)  print_to_file(__FILE__,__LINE__ ,__VA_ARGS__)
@@ -54,7 +54,7 @@ public:
 
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, T obj) {
-#ifdef DEBUG
+#ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ <<"\n";
 #endif
 		dbg->print_to_file(userfile, lineno, obj);
@@ -63,7 +63,7 @@ public:
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, const char* tag,
 			T* obj) {
-#ifdef DEBUG
+#ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ <<"\n";
 #endif
 		dbg->print_to_file(userfile, lineno, tag, obj);
@@ -79,7 +79,7 @@ public:
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, const char* tag,
 			T &obj) {
-#ifdef DEBUG
+#ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ <<"\n";
 #endif
 		this->print_to_file(userfile, lineno, tag, &obj);
@@ -88,7 +88,7 @@ public:
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, const char* tag,
 			T* obj, ADDON addon) {
-#ifdef DEBUG
+#ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ <<"\n";
 #endif
 		dbg->print_to_file(userfile, lineno, tag, obj, addon);
@@ -97,7 +97,7 @@ public:
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, const char* tag,
 			T obj, ADDON addon) {
-#ifdef DEBUG
+#ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ <<"\n";
 #endif
 		dbg->print_to_file(userfile, lineno, &tag, obj, addon);
@@ -106,7 +106,7 @@ public:
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, const char* tag,
 			T &obj, ADDON addon) {
-#ifdef DEBUG
+#ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ <<"\n";
 #endif
 		dbg->print_to_file(userfile, lineno, &tag, obj, addon);
@@ -114,7 +114,7 @@ public:
 
 	void print_to_file(const char * userfile, int lineno, const char* tag,
 			unsigned int obj) {
-#ifdef DEBUG
+#ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ <<"\n";
 #endif
 		dbg->print_to_file(userfile, lineno, tag, &obj);
@@ -122,7 +122,7 @@ public:
 
 	void print_to_file(const char * userfile, int lineno, const char* tag,
 			int obj) {
-#ifdef DEBUG
+#ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ <<"\n";
 #endif
 		dbg->print_to_file(userfile, lineno, tag, &obj);
