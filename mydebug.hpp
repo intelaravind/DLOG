@@ -38,23 +38,19 @@ std::string br = "<br>";
 #define NBSP "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 #define CALLINFO "<span class='CALLINFO' id='CALLINFO' style=\"font-size:12px\">"<<NBSP<<RED(userfile)<<":"<<RED(lineno)<<"</span>\n"
 
-class ADDON
-{
+class ADDON {
 	std::string s;
 
 public:
-	ADDON()
-	{
+	ADDON() {
 		s = "";
 	}
 
-	ADDON(const std::string in)
-	{
+	ADDON(const std::string in) {
 		s = in;
 	}
 
-	void operator=(const std::string in)
-	{
+	void operator=(const std::string in) {
 		s = in;
 	}
 
@@ -62,19 +58,16 @@ public:
 //		s = obj.s;
 //	}
 
-	ADDON(const ADDON &obj)
-	{
+	ADDON(const ADDON &obj) {
 		s = obj.s;
 	}
 
-	std::string getString()
-	{
+	std::string getString() {
 		return s;
 	}
 };
 
-bool replace(std::string& str, const std::string& from, const std::string& to)
-{
+bool replace(std::string& str, const std::string& from, const std::string& to) {
 	size_t start_pos = str.find(from);
 	if (start_pos == std::string::npos)
 		return false;
@@ -83,13 +76,11 @@ bool replace(std::string& str, const std::string& from, const std::string& to)
 }
 
 void replaceAll(std::string& str, const std::string& from,
-		const std::string& to)
-{
+		const std::string& to) {
 	if (from.empty())
 		return;
 	size_t start_pos = 0;
-	while ((start_pos = str.find(from, start_pos)) != std::string::npos)
-	{
+	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
 		str.replace(start_pos, from.length(), to);
 		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
 	}
@@ -97,8 +88,7 @@ void replaceAll(std::string& str, const std::string& from,
 
 static int gid = 0;
 
-class aravdebug
-{
+class aravdebug {
 
 	std::string ErrorInfo;
 	std::string dataPath;
@@ -110,8 +100,7 @@ class aravdebug
 
 public:
 
-	aravdebug(const char * userfile, int lineno, const char *PATH)
-	{
+	aravdebug(const char * userfile, int lineno, const char *PATH) {
 
 		dataPath = getenv("DLOG_OUTPUT_FOLDER") + std::string(PATH);
 
@@ -121,7 +110,9 @@ public:
 
 		std::string syscall = "rm -f " + dataPath;
 
-		system(syscall.c_str());
+		int status = system(syscall.c_str());
+		if (status < 0)
+			std::cout << "DLOG Error: " << strerror(errno) << '\n';
 
 		OS.reset((new llvm::raw_fd_ostream(datatempPath.c_str(), ErrorInfo)));
 
@@ -131,29 +122,77 @@ public:
 
 		//llvm::errs()<<"created DLOG with id "<<id<<"\n";
 		tagset.insert("SYSTEM");
-		(*OS) << DIV("SYSTEM") << "Created Debugger " << GREEN(id) << CALLINFO
-				<< EDIV;
+		(*OS) << DIV("SYSTEM")<< "Created Debugger " << GREEN(id)
+		<< CALLINFO
+		<< EDIV;
 
 		tagset.insert("CALLINFO");
 
 		(*OS).flush();
 	}
 
-	~aravdebug()
-	{
+	~aravdebug() {
 
 		//llvm::errs()<<"Datapath "<<dataPath.c_str()<<"\n";
 		//llvm::errs()<<"datatempPath "<<datatempPath.c_str()<<"\n";
 
+		int status;
 		std::fstream fwrite;
 		fwrite.open(dataPath.c_str(), std::fstream::out);
 
 		fwrite
-				<< "<head> <script type='text/javascript' src='aravind.js' ></script> </head> <body> <style>div.floating-menu {position:fixed;background:#fff4c8;border:1px solid #ffcc00;width:150px;z-index:100; left:70%;top:150px;} div.floating-menu a, div.floating-menu h3 {display:block;margin:0 0.5em;} </style>\n";
+				<< "<head>\n"
+						"<script type='text/javascript' src='aravind.js' ></script>\n"
+						"<script type='text/javascript' src='jquery-2.0.3.min.js'></script>\n";
 
-		fwrite << DIV("floating-menu");
-		for (auto it = tagset.begin(); it != tagset.end(); ++it)
-		{
+		fwrite
+				<< "<script type=\"text/javascript\">"
+						"$(document).ready(function() {"
+						"$(\"ar_menu\").click(function(){"
+						"$(this).toggleClass(\"active\");"
+						"$(this).next(\"div\").stop('true','true').slideToggle(\"500\");"
+						"});"
+						"});"
+						"</script>\n";
+		fwrite << "\n</head>\n ";
+		fwrite
+				<< "<body>\n"
+						"<style>div.floating-menu {background:#fff4c8;border:1px solid #ffcc00;width:150px;margin-top:5px;margin-bottom:10px; } "
+						"div.floating-menu a, div.floating-menu h3 {display:block;margin:0 0.5em;} </style>";
+
+		fwrite
+				<< "<style>"
+						"div.floating-container{top:35%;left:75%;position:fixed;z-index:100;}\n"
+						"div.floating-container ar_menu:hover{background:#FFFFE0}\n"
+						"div.floating-container ar_menu{list-style-type:none; cursor:pointer; border-top:2px solid #666666; border-bottom:2px solid #666666;padding:2px 2px 2px 2px;margin-top:10px;}\n"
+						"div.floating-container ar_menu div:hover{text-decoration:none !important;}\n"
+						"div.floating-container ar_menu:before {content: \" + \"; \n"
+						"padding:0px 5px 1px 5px; color:red; font-weight:bold;background:#4A5A6D}\n"
+						"div.floating-container ar_menu.active:before {content: \" - \";\n"
+						" padding:0px 5px 1px 5px; color:red; font-weight:bold;background:#4A5A6D}\n"
+						".floating-topic{background:#B7B8B5;display: inline-block; width:125px;margin-bottom:5px;}\n"
+						"</style>\n";
+
+		fwrite << DIV("floating-container");
+		auto it = tagset.begin();
+
+		//for callinfo
+		fwrite
+				<< "<ar_menu><span class=\"floating-topic\"><b>&nbsp;&nbsp;Extra info</b></span></ar_menu>\n";
+
+		fwrite << "<div class=\"floating-menu\">" << CHKBOX(*it) << EDIV;
+
+		//for avoiding collapsing problem
+		fwrite << DIV("")<<EDIV;
+
+
+		//tags begin here
+		fwrite
+					<< "<ar_menu><span class=\"floating-topic\"><b>&nbsp;&nbsp;Tags</b></span></ar_menu>\n";
+
+		fwrite << "<div class=\"floating-menu\">" ;
+		++it;
+		for (; it != tagset.end(); ++it) {
 			fwrite << CHKBOX(*it);
 
 		}
@@ -166,66 +205,64 @@ public:
 				<< mendl;
 		fwrite << EDIV;
 
-		(*OS) << DIV("SYSTEM") << br << "Destroyed Debugger " << GREEN(id)
-				<< EDIV;
+		fwrite << EDIV; //container
+
+		(*OS) << DIV("SYSTEM")<< br << "Destroyed Debugger " << GREEN(id)
+		<< EDIV;
 		fwrite << "</body> </html>";
 		fwrite.close();
 
-		if (!system(NULL ))
+		if (!system(NULL))
 			(*OS) << RED("System command failed in debugger\n");
 
-		OS.reset(NULL );
+		OS.reset(NULL);
 
 		std::string syscommand = "cat " + datatempPath + " >> " + dataPath;
 
-		//llvm::errs()<<syscommand;
+//llvm::errs()<<syscommand;
 
-		system(syscommand.c_str());
+		status = system(syscommand.c_str());
+		if (status < 0)
+			std::cout << "DLOG Error: " << strerror(errno) << '\n';
 
 		syscommand = "rm -f " + datatempPath;
-		system(syscommand.c_str());
+		status = system(syscommand.c_str());
+		if (status < 0)
+			std::cout << "DLOG Error: " << strerror(errno) << '\n';
 
 		unsigned found = datatempPath.find_last_of("/\\");
 
 		syscommand = "cp $DLOG_PATH/aravind.js "
 				+ datatempPath.substr(0, found);
-		system(syscommand.c_str());
+		status = system(syscommand.c_str());
+		if (status < 0)
+			std::cout << "DLOG Error: " << strerror(errno) << '\n';
 
-		//system("echo `pwd`");
+		syscommand = "cp $DLOG_PATH/jquery-2.0.3.min.js "
+				+ datatempPath.substr(0, found);
+		status = system(syscommand.c_str());
+		if (status < 0)
+			std::cout << "DLOG Error: " << strerror(errno) << '\n';
+
+//system("echo `pwd`");
 
 	}
 
-//	template<typename T, typename F>
-//	void graph_save(T &tag, F &fun, std::string s = "", ADDON addon = ADDON())
-//	{
-//
-//		std::string Filename = "/home/nfs/aravind/graph" + llvm::itostr(gid)
-//				+ "cfg" + ".dot";
-//
-//		std::string ErrorInfo;
-//		llvm::raw_fd_ostream File(Filename.c_str(), ErrorInfo);
-//		if (ErrorInfo.empty())
-//		{
-//			WriteGraph(File, (const llvm::Function*) &fun, true, "test");
-//			ViewGraph(&fun, "cfg:" + llvm::itostr(gid));
-//		}
-//		else
-//		{
-//			llvm::errs() << "  error opening file for writing!";
-//		}
-//
-//		llvm::errs() << ErrorInfo;
-//		gid++;
-//
-//	}
+	void print_to_file(const char * userfile, int lineno, const char* tag,
+			const char* objS) {
+
+//llvm::errs()<<"I am called in line no"<<__LINE__;
+		tagset.insert(tag);
+		(*OS) << DIV(tag) << BOLD("<br>Tag : ") << RED(tag) << NBSP << CALLINFO
+		<< NBSP << BOLD(" Data : <br>") << objS << EDIV;
+		(*OS).flush();
+	}
 
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, const char* tag,
-			T* obj)
-	{
+			T &obj) {
 		std::string msg;
-
-		//llvm::errs()<<"I am called in line no"<<__LINE__;
+//llvm::errs()<<"I am called in line no"<<__LINE__;
 
 		llvm::raw_string_ostream Msg(msg);
 		Msg << obj;
@@ -234,18 +271,35 @@ public:
 		replaceAll(objS, "\n", mendl);
 		tagset.insert(tag);
 		(*OS) << DIV(tag) << BOLD("<br>Tag : ") << RED(tag) << NBSP << CALLINFO
-				<< NBSP << BOLD(" Data : <br>") << objS << EDIV;
+		<< NBSP << BOLD(" Data : <br>") << objS << EDIV;
+		(*OS).flush();
+	}
+
+	template<typename T>
+	void print_to_file(const char * userfile, int lineno, const char* tag,
+			T* obj) {
+		std::string msg;
+
+//llvm::errs()<<"I am called in line no"<<__LINE__;
+
+		llvm::raw_string_ostream Msg(msg);
+		Msg << *obj;
+		std::string objS = Msg.str();
+
+		replaceAll(objS, "\n", mendl);
+		tagset.insert(tag);
+		(*OS) << DIV(tag) << BOLD("<br>Tag : ") << RED(tag) << NBSP << CALLINFO
+		<< NBSP << BOLD(" Data : <br>") << objS << EDIV;
 		(*OS).flush();
 	}
 
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, T obj, ADDON addon =
-			ADDON())
-	{
+			ADDON()) {
 
 		tagset.insert("notag");
 		(*OS) << DIV("notag") << br << BLUE( obj) << NBSP << CALLINFO << NBSP
-				<< BROWN(addon.getString()) << NBSP << EDIV;
+		<< BROWN(addon.getString()) << NBSP << EDIV;
 		(*OS).flush();
 	}
 
@@ -261,8 +315,7 @@ public:
 
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, const char* tag,
-			T *obj, ADDON addon)
-	{
+			T *obj, ADDON addon) {
 		std::string msg;
 		llvm::raw_string_ostream Msg(msg);
 		Msg << *obj;
@@ -273,8 +326,8 @@ public:
 		tagset.insert(tag);
 
 		(*OS) << DIV(tag) << BOLD("<br>Tag : ") << RED(tag) << NBSP << CALLINFO
-				<< NBSP << BROWN(addon.getString()) << NBSP
-				<< BOLD(" Data : <br>") << objS << EDIV;
+		<< NBSP << BROWN(addon.getString()) << NBSP
+		<< BOLD(" Data : <br>") << objS << EDIV;
 		(*OS).flush();
 	}
 //
@@ -297,26 +350,24 @@ public:
 
 	template<typename S>
 	void print_to_file(const char * userfile, int lineno, S tag, int obj,
-			ADDON addon = ADDON())
-	{
+			ADDON addon = ADDON()) {
 
 		tagset.insert(tag);
 
 		(*OS) << DIV(tag) << BOLD("<br>Tag : ") << RED(tag) << NBSP << CALLINFO
-				<< NBSP << BROWN(addon.getString()) << NBSP
-				<< BOLD(" Data : <br>") << obj << EDIV;
+		<< NBSP << BROWN(addon.getString()) << NBSP
+		<< BOLD(" Data : <br>") << obj << EDIV;
 		(*OS).flush();
 	}
 
 	template<typename S>
 	void print_to_default_file(const char * userfile, int lineno, S tag,
-			unsigned int obj, ADDON addon = ADDON())
-	{
+			unsigned int obj, ADDON addon = ADDON()) {
 
 		tagset.insert(tag);
 		(*OS) << DIV(tag) << BOLD("<br>Tag : ") << RED(tag) << NBSP << CALLINFO
-				<< NBSP << BROWN(addon.getString()) << NBSP
-				<< BOLD(" Data : <br>") << obj << EDIV;
+		<< NBSP << BROWN(addon.getString()) << NBSP
+		<< BOLD(" Data : <br>") << obj << EDIV;
 		(*OS).flush();
 	}
 

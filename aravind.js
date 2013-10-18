@@ -1,3 +1,7 @@
+/*
+* @author aravind
+*/
+
 var hidden = false;
 function getElementsByClass(searchClass, domNode, tagName) {
 	if (domNode == null) domNode = document;
