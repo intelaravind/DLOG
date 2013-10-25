@@ -18,6 +18,34 @@
 #define PRINT_TO_FILE(...)  print_to_file(__FILE__,__LINE__ ,__VA_ARGS__)
 
 /**
+ * Just a wrapper
+ */
+class DLOG_GRAPH
+{
+	aravgraph* graph;
+public:
+	DLOG_GRAPH(const char *PATH)
+	{
+		graph = new aravgraph(PATH);
+	}
+
+	int dlog_add_graph(const char * name, const char *title)
+	{
+		return graph->newgraph(name, title);
+
+	}
+
+	void dlog_insert_val(int graphid, double val, const char *key)
+	{
+		graph->insertval(graphid, val, key);
+	}
+	~DLOG_GRAPH()
+	{
+		delete graph;
+	}
+};
+
+/**
  * If MDEBG class in instantiated with same path from two
  * different code points or files, we should append the data.
  * path_to_debug_map maps the path to the aravdebug instance
@@ -28,13 +56,16 @@ static std::map<std::string, aravdebug*> path_to_debug_map;
 /***
  * Wrapper for aravdebug
  */
-class DLOG {
+class DLOG
+{
 	aravdebug *dbg;
 	int should_free = 0;
 
 public:
-	DLOG(const char * userfile, int lineno, const char *PATH) {
-		if (path_to_debug_map.find(PATH) != path_to_debug_map.end()) {
+	DLOG(const char * userfile, int lineno, const char *PATH)
+	{
+		if (path_to_debug_map.find(PATH) != path_to_debug_map.end())
+		{
 			dbg = path_to_debug_map.find(PATH)->second;
 			should_free++;
 			/*
@@ -45,7 +76,9 @@ public:
 			 << "\tIGNORING THE REQUEST TO CREATE A NEW FILE ::" << userfile<<":"<<lineno;
 			 }
 			 */
-		} else {
+		}
+		else
+		{
 			dbg = new aravdebug(userfile, lineno, PATH);
 
 			path_to_debug_map[PATH] = dbg;
@@ -53,7 +86,8 @@ public:
 	}
 
 	template<typename T>
-	void print_to_file(const char * userfile, int lineno, T obj) {
+	void print_to_file(const char * userfile, int lineno, T obj)
+	{
 #ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
 #endif
@@ -62,7 +96,8 @@ public:
 
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, const char* tag,
-			T* obj) {
+			T* obj)
+	{
 #ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
 #endif
@@ -78,7 +113,8 @@ public:
 
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, const char* tag,
-			T &obj) {
+			T &obj)
+	{
 #ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
 #endif
@@ -87,7 +123,8 @@ public:
 
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, const char* tag,
-			T* obj, ADDON addon) {
+			T* obj, ADDON addon)
+	{
 #ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
 #endif
@@ -96,7 +133,8 @@ public:
 
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, const char* tag,
-			T obj, ADDON addon) {
+			T obj, ADDON addon)
+	{
 #ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
 #endif
@@ -105,7 +143,8 @@ public:
 
 	template<typename T>
 	void print_to_file(const char * userfile, int lineno, const char* tag,
-			T &obj, ADDON addon) {
+			T &obj, ADDON addon)
+	{
 #ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
 #endif
@@ -113,7 +152,8 @@ public:
 	}
 
 	void print_to_file(const char * userfile, int lineno, const char* tag,
-			unsigned int obj) {
+			unsigned int obj)
+	{
 #ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
 #endif
@@ -121,19 +161,24 @@ public:
 	}
 
 	void print_to_file(const char * userfile, int lineno, const char* tag,
-			int obj) {
+			int obj)
+	{
 #ifdef DLOG_DEBUG
 		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
 #endif
 		dbg->print_to_file(userfile, lineno, tag, &obj);
 	}
 
-	~DLOG() {
+	~DLOG()
+	{
 		//llvm::errs() << "Calling ~MDEBG\n";
 
-		if (should_free == 0) {
+		if (should_free == 0)
+		{
 			delete dbg;
-		} else {
+		}
+		else
+		{
 			should_free--;
 		}
 	}
