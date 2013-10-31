@@ -190,7 +190,7 @@ public:
 			ARAV_GRAPH_VAL *temp_graph = &graphs[i];
 
 			if (temp_graph == NULL) {
-				errs() << "ERROR: GRAPH NULL\n";
+				llvm::errs() << "ERROR: GRAPH NULL\n";
 				exit(1);
 			}
 

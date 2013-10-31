@@ -7,8 +7,8 @@
  * This class is a wrapper for mydebug class
  */
 
-#ifndef MDEBG_HPP_
-#define MDEBG_HPP_
+#ifndef DLOG_HPP_
+#define DLOG_HPP_
 
 #include "mydebug.hpp"
 
