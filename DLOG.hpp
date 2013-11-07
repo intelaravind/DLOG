@@ -1,5 +1,5 @@
 /*
- * MDEBG.hpp
+ * DLOG.hpp
  *
  *  Created on: Jul 11, 2013
  *      Author: aravind
@@ -14,36 +14,13 @@
 
 //#define DLOG_DEBUG
 
+#ifdef DLOG_ENABLE
 #define MDEBG_CREATE(path)  DLOG(__FILE__,__LINE__,path)
 #define PRINT_TO_FILE(...)  print_to_file(__FILE__,__LINE__ ,__VA_ARGS__)
-
-/**
- * Just a wrapper
- */
-class DLOG_GRAPH
-{
-	aravgraph* graph;
-public:
-	DLOG_GRAPH(const char *PATH)
-	{
-		graph = new aravgraph(PATH);
-	}
-
-	int dlog_add_graph(const char * name, const char *title)
-	{
-		return graph->newgraph(name, title);
-
-	}
-
-	void dlog_insert_val(int graphid, double val, const char *key)
-	{
-		graph->insertval(graphid, val, key);
-	}
-	~DLOG_GRAPH()
-	{
-		delete graph;
-	}
-};
+#else
+#define MDEBG_CREATE(path)  DLOG()
+#define PRINT_TO_FILE(...)  print_to_file()
+#endif
 
 /**
  * If MDEBG class in instantiated with same path from two
@@ -62,6 +39,15 @@ class DLOG
 	int should_free = 0;
 
 public:
+
+	/**
+	 * Empty constructor to do nothing;
+	 * Used mainly to disable DLOG
+	 */
+	DLOG()
+	{
+
+	}
 	DLOG(const char * userfile, int lineno, const char *PATH)
 	{
 		if (path_to_debug_map.find(PATH) != path_to_debug_map.end())
@@ -83,6 +69,14 @@ public:
 
 			path_to_debug_map[PATH] = dbg;
 		}
+	}
+
+	/**
+	 * Do nothing. Used mainly for disabling DLOG
+	 */
+	void print_to_file()
+	{
+
 	}
 
 	template<typename T>
