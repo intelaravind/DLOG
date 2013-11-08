@@ -13,6 +13,7 @@
 #include "mydebug.hpp"
 
 //#define DLOG_DEBUG
+//#define DLOG_ENABLE
 
 #ifdef DLOG_ENABLE
 #define MDEBG_CREATE(path)  DLOG(__FILE__,__LINE__,path)
@@ -165,6 +166,8 @@ public:
 
 	~DLOG()
 	{
+
+#ifdef DLOG_ENABLE
 		//llvm::errs() << "Calling ~MDEBG\n";
 
 		if (should_free == 0)
@@ -175,6 +178,7 @@ public:
 		{
 			should_free--;
 		}
+#endif
 	}
 
 };
