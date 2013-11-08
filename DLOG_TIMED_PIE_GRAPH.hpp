@@ -49,8 +49,10 @@ public:
 		pie_graph->dlog_insert_val(graph_id, time, items[timer_id].c_str());
 		return time;
 	}
-	long int reset(int graph_id, int timer_id)
+	long int reset(TID id)
 	{
+		int graph_id = id.first;
+		int timer_id = id.second;
 		timer[graph_id].reset(timer_id);
 	}
 	~DLOG_TIMED_PIE_GRAPH()
