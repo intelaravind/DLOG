@@ -10,34 +10,36 @@
 #ifndef DLOG_HPP_
 #define DLOG_HPP_
 
-#include "mydebug.hpp"
+#include "DLOG_HELPER.hpp"
 
 //#define DLOG_DEBUG
-//#define DLOG_ENABLE
+#define DLOG_ENABLE
+
+//Dont delete the temp files
+#define DLOG_KEEP_TEMP_FILES 1
 
 #ifdef DLOG_ENABLE
-#define MDEBG_CREATE(path)  DLOG(__FILE__,__LINE__,path)
+#define DLOG_CREATE(path)  DLOG(__FILE__,__LINE__,path)
 #define PRINT_TO_FILE(...)  print_to_file(__FILE__,__LINE__ ,__VA_ARGS__)
 #else
-#define MDEBG_CREATE(path)  DLOG()
+#define DLOG_CREATE(path)  DLOG()
 #define PRINT_TO_FILE(...)  print_to_file()
 #endif
 
+static int gid = 0;
+
 /**
- * If MDEBG class in instantiated with same path from two
- * different code points or files, we should append the data.
- * path_to_debug_map maps the path to the aravdebug instance
- */
-
-static std::map<std::string, aravdebug*> path_to_debug_map;
-
-/***
- * Wrapper for aravdebug
+ * DLOG main class
  */
 class DLOG
 {
-	aravdebug *dbg;
-	int should_free = 0;
+	std::string ErrorInfo;
+	std::string dataPath;
+	std::string tagPath;
+	std::string datatempPath;
+	int id;
+
+	std::set<std::string> tagset;
 
 public:
 
@@ -51,138 +53,64 @@ public:
 	}
 	DLOG(const char * userfile, int lineno, const char *PATH)
 	{
-		if (path_to_debug_map.find(PATH) != path_to_debug_map.end())
-		{
-			dbg = path_to_debug_map.find(PATH)->second;
-			should_free++;
-			/*
-			 if (filemode == FILE_NEW)
-			 {
-			 std::cout
-			 << "WARNING (MDEBG): OBJECT WITH SAME PATH WAS CREATED EARLIER.\n"
-			 << "\tIGNORING THE REQUEST TO CREATE A NEW FILE ::" << userfile<<":"<<lineno;
-			 }
-			 */
-		}
-		else
-		{
-			dbg = new aravdebug(userfile, lineno, PATH);
+		dataPath = getenv("DLOG_OUTPUT_FOLDER") + std::string(PATH);
 
-			path_to_debug_map[PATH] = dbg;
-		}
-	}
+		datatempPath = dataPath + ".temp";
+		tagPath = dataPath + ".tag";
 
-	/**
-	 * Do nothing. Used mainly for disabling DLOG
-	 */
-	void print_to_file()
-	{
+		std::string syscall = "rm -f " + dataPath;
 
-	}
+		int status = system(syscall.c_str());
+		if (status < 0)
+			std::cout << "DLOG Error: " << strerror(errno) << '\n';
 
-	template<typename T>
-	void print_to_file(const char * userfile, int lineno, T obj)
-	{
-#ifdef DLOG_DEBUG
-		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
-#endif
-		dbg->print_to_file(userfile, lineno, obj);
-	}
+		//for temporary data
+		std::fstream fdata;
+		fdata.open(datatempPath.c_str(), std::fstream::out);
 
-	template<typename T>
-	void print_to_file(const char * userfile, int lineno, const char* tag,
-			T* obj)
-	{
-#ifdef DLOG_DEBUG
-		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
-#endif
-		dbg->print_to_file(userfile, lineno, tag, obj);
-	}
+		//for temporary tags
+		std::fstream ftags;
+		ftags.open(tagPath.c_str(), std::fstream::out);
 
-//	template<typename T>
-//	void print_to_file(const char * userfile, int lineno, const char* tag,
-//			T obj)
-//	{
-//		dbg->print_to_file(userfile, lineno, tag, &obj);
-//	}
+		//default tags
+		ftags << CHKBOX("SYSTEM");
+		ftags << CHKBOX("CALLINFO");
 
-	template<typename T>
-	void print_to_file(const char * userfile, int lineno, const char* tag,
-			T &obj)
-	{
-#ifdef DLOG_DEBUG
-		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
-#endif
-		dbg->print_to_file(userfile, lineno, tag, obj);
-	}
+		fdata << DIV("SYSTEM") << "Created Debugger " << GREEN(id) << CALLINFO
+				<< EDIV;
 
-	template<typename T>
-	void print_to_file(const char * userfile, int lineno, const char* tag,
-			T* obj, ADDON addon)
-	{
-#ifdef DLOG_DEBUG
-		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
-#endif
-		dbg->print_to_file(userfile, lineno, tag, obj, addon);
-	}
-
-	template<typename T>
-	void print_to_file(const char * userfile, int lineno, const char* tag,
-			T obj, ADDON addon)
-	{
-#ifdef DLOG_DEBUG
-		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
-#endif
-		dbg->print_to_file(userfile, lineno, &tag, obj, addon);
-	}
-
-	template<typename T>
-	void print_to_file(const char * userfile, int lineno, const char* tag,
-			T &obj, ADDON addon)
-	{
-#ifdef DLOG_DEBUG
-		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
-#endif
-		dbg->print_to_file(userfile, lineno, &tag, obj, addon);
-	}
-
-	void print_to_file(const char * userfile, int lineno, const char* tag,
-			unsigned int obj)
-	{
-#ifdef DLOG_DEBUG
-		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
-#endif
-		dbg->print_to_file(userfile, lineno, tag, &obj);
-	}
-
-	void print_to_file(const char * userfile, int lineno, const char* tag,
-			int obj)
-	{
-#ifdef DLOG_DEBUG
-		llvm::errs() << "I am called in line no" << __LINE__ << "\n";
-#endif
-		dbg->print_to_file(userfile, lineno, tag, &obj);
+		id = gid++;
 	}
 
 	~DLOG()
 	{
+		std::string syscommand;
+		int status;
 
-#ifdef DLOG_ENABLE
-		//llvm::errs() << "Calling ~MDEBG\n";
+#if (DLOG_KEEP_TEMP_FILES ==0)
 
-		if (should_free == 0)
-		{
-			delete dbg;
-		}
-		else
-		{
-			should_free--;
-		}
+		syscommand = "rm -f " + datatempPath;
+		status = system(syscommand.c_str());
+		if (status < 0)
+		std::cout << "DLOG Error: " << strerror(errno) << '\n';
+
+		syscommand = "rm -f " + tagPath;
+		status = system(syscommand.c_str());
+		if (status < 0)
+		std::cout << "DLOG Error: " << strerror(errno) << '\n';
 #endif
+
 	}
 
+	void print_to_file();
 };
 
-//MDEBG d1 = MDEBG_CREATE("temp");
+/**
+ * Do nothing. Used mainly for disabling DLOG
+ */
+void DLOG::print_to_file()
+{
 
-#endif /* MDEBG_HPP_ */
+}
+
+#endif /* DLOG_HPP_ */
