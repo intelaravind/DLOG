@@ -18,12 +18,18 @@
 //Dont delete the temp files
 #define DLOG_KEEP_TEMP_FILES 1
 
+//print the output to file
+#define DLOG_OUTPUT_FILE 1
+
+//print the output to stdout
+#define DLOG_OUTPUT_STDOUT 0;
+
 #ifdef DLOG_ENABLE
-#define DLOG_CREATE(path)  DLOG(__FILE__,__LINE__,path)
-#define PRINT_TO_FILE(...)  print_to_file(__FILE__,__LINE__ ,__VA_ARGS__)
+#define DLOG_CREATE(path) (__FILE__,__LINE__,path)
+#define DLOG_PRINT(obj,...)  obj.print(__FILE__,__LINE__ ,__VA_ARGS__)
 #else
-#define DLOG_CREATE(path)  DLOG()
-#define PRINT_TO_FILE(...)  print_to_file()
+#define DLOG_CREATE(path)()
+#define DLOG_PRINT(...)  print()
 #endif
 
 static int gid = 0;
@@ -37,9 +43,17 @@ class DLOG
 	std::string dataPath;
 	std::string tagPath;
 	std::string datatempPath;
-	int id;
-
+	//set of known tags
 	std::set<std::string> tagset;
+
+	///for temporary data
+	std::fstream fdata;
+	///for temporary tags
+	std::fstream ftags;
+
+	///Output on file (DLOG_OUTPUT_FILE) or stdout (DLOG_OUTPUT_STDOUT)
+	int outputmode;
+	int id;
 
 public:
 
@@ -51,64 +65,130 @@ public:
 	{
 
 	}
-	DLOG(const char * userfile, int lineno, const char *PATH)
-	{
-		dataPath = getenv("DLOG_OUTPUT_FOLDER") + std::string(PATH);
 
-		datatempPath = dataPath + ".temp";
-		tagPath = dataPath + ".tag";
+	DLOG(const char *, int, const char *, std::string);
+	~DLOG();
 
-		std::string syscall = "rm -f " + dataPath;
+	void tag_handler(std::string);
 
-		int status = system(syscall.c_str());
-		if (status < 0)
-			std::cout << "DLOG Error: " << strerror(errno) << '\n';
+	template<typename T>
+	void print(const char *, int, T);
 
-		//for temporary data
-		std::fstream fdata;
-		fdata.open(datatempPath.c_str(), std::fstream::out);
-
-		//for temporary tags
-		std::fstream ftags;
-		ftags.open(tagPath.c_str(), std::fstream::out);
-
-		//default tags
-		ftags << CHKBOX("SYSTEM");
-		ftags << CHKBOX("CALLINFO");
-
-		fdata << DIV("SYSTEM") << "Created Debugger " << GREEN(id) << CALLINFO
-				<< EDIV;
-
-		id = gid++;
-	}
-
-	~DLOG()
-	{
-		std::string syscommand;
-		int status;
-
-#if (DLOG_KEEP_TEMP_FILES ==0)
-
-		syscommand = "rm -f " + datatempPath;
-		status = system(syscommand.c_str());
-		if (status < 0)
-		std::cout << "DLOG Error: " << strerror(errno) << '\n';
-
-		syscommand = "rm -f " + tagPath;
-		status = system(syscommand.c_str());
-		if (status < 0)
-		std::cout << "DLOG Error: " << strerror(errno) << '\n';
-#endif
-
-	}
-
-	void print_to_file();
+	void print();
 };
 
 /**
- * Do nothing. Used mainly for disabling DLOG
+ * The main DLOG constructor
+ * @param userfile : The file which called the constructor
+ * @param lineno : The lineno in the user file which called the constructor
+ * @param OUT_FILE : The output file name.
+ * @param inpPath : The path of output file. If none is given the environment variable DLOG_OUTPUT_FOLDER is used
  */
-void DLOG::print_to_file()
+DLOG::DLOG(const char * userfile, int lineno, const char *OUT_FILE,
+		std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
+{
+	DLOG::dataPath = inpPath + std::string(OUT_FILE);
+
+//	std::cout << dataPath << "\n";
+
+	outputmode = DLOG_OUTPUT_FILE;
+
+	datatempPath = DLOG::dataPath + ".temp";
+	tagPath = DLOG::dataPath + ".tag";
+
+	std::string syscall = "rm -f " + DLOG::dataPath;
+
+	int status = system(syscall.c_str());
+	if (status < 0)
+		std::cout << "DLOG Error: " << strerror(errno) << '\n';
+
+	fdata.open(datatempPath.c_str(), std::fstream::out);
+	ftags.open(tagPath.c_str(), std::fstream::out);
+
+	//default tags
+	ftags << CHKBOX("SYSTEM");
+
+	//insert known tags to taglist
+	tag_handler("SYSTEM");
+	tag_handler("CALLINFO");
+
+	fdata << DIV("SYSTEM") << "Created Debugger " << GREEN(id) << CALLINFO
+			<< EDIV;
+	id = gid++;
+}
+
+DLOG::~DLOG()
+{
+	std::string syscommand;
+	int status;
+
+	fdata << DIV("SYSTEM") << "Destroyed Debugger " << GREEN(id) << EDIV;
+	fdata.close();
+
+	unsigned found = datatempPath.find_last_of("/\\");
+
+	syscommand = "cp -r $DLOG_PATH/js " + datatempPath.substr(0, found);
+	status = system(syscommand.c_str());
+	if (status < 0)
+		std::cout << "DLOG Error: " << strerror(errno) << '\n';
+
+
+	syscommand = "$DLOG_PATH/DLOG_FINALIZER.out "
+			+ dataPath;
+//	std::cout << syscommand<<"\n";
+	status = system(syscommand.c_str());
+	if (status < 0)
+		std::cout << "DLOG Error: " << strerror(errno) << '\n';
+
+#if (DLOG_KEEP_TEMP_FILES ==0)
+
+	syscommand = "rm -f " + datatempPath;
+	status = system(syscommand.c_str());
+	if (status < 0)
+	std::cout << "DLOG Error: " << strerror(errno) << '\n';
+
+	syscommand = "rm -f " + tagPath;
+	status = system(syscommand.c_str());
+	if (status < 0)
+	std::cout << "DLOG Error: " << strerror(errno) << '\n';
+#endif
+
+}
+
+/**
+ * @brief adds the tag to the file if it does not exit
+ * @param input : The input tag
+ */
+void DLOG::tag_handler(std::string input)
+{
+
+	std::pair<std::set<std::string>::iterator, bool> ret;
+	ret = tagset.insert(input);
+
+	//A new element was inserted so add it to file
+	if (ret.second)
+	{
+		tagset.insert("SYSTEM");
+		tagset.insert("CALLINFO");
+	}
+
+}
+
+template<typename T>
+void DLOG::print(const char *userfile, int lineno, T obj)
+{
+	tag_handler("notag");
+	fdata
+			<< DIV(
+					"notag") << br<< CALLINFO << NBSP << BOLD(" Data : <br>") << obj << EDIV;
+
+	fdata.flush();
+}
+
+/**
+ * Does nothing. Used mainly for disabling DLOG
+ */
+void DLOG::print()
 {
 
 }

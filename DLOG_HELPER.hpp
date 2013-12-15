@@ -1,4 +1,4 @@
-/*
+/**
  * DLOG_HELPER.hpp
  *
  *  Created on: Dec 15, 2013
@@ -9,7 +9,6 @@
 #define DLOG_HELPER_HPP_
 
 #include "debug_common_headers.hpp"
-
 
 std::string mendl = "<br>\n";
 std::string br = "<br>";
@@ -28,6 +27,5 @@ std::string br = "<br>";
 #define ESPAN "</span>\n"
 #define NBSP "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 #define CALLINFO "<span class='CALLINFO' id='CALLINFO' style=\"font-size:12px\">"<<NBSP<<RED(userfile)<<":"<<RED(lineno)<<"</span>\n"
-
 
 #endif /* DLOG_HELPER_HPP_ */
