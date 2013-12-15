@@ -22,7 +22,6 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/InstIterator.h"
-#include "llvm/Support/IRBuilder.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/GraphWriter.h"
 
@@ -31,31 +30,24 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringExtras.h"
 
-#include "llvm/Transforms/Utils/FunctionUtils.h"
-#include "llvm/Transforms/Utils/Cloning.h"
-#include "llvm/Transforms/Utils/BasicBlockUtils.h"
-
 #include "llvm/Assembly/Writer.h"
 #include "llvm/Assembly/PrintModulePass.h"
 #include "llvm/Assembly/AssemblyAnnotationWriter.h"
 
-#include "llvm/Target/TargetData.h"
-
-
-#include "llvm/Module.h"
-#include "llvm/Function.h"
-#include "llvm/BasicBlock.h"
-#include "llvm/Instruction.h"
-#include "llvm/Instructions.h"
-#include "llvm/Metadata.h"
-#include "llvm/LLVMContext.h"
-#include "llvm/InlineAsm.h"
-#include "llvm/GlobalValue.h"
-#include "llvm/CallingConv.h"
-#include "llvm/Type.h"
-#include "llvm/Argument.h"
-#include "llvm/Attributes.h"
-#include "llvm/DerivedTypes.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Metadata.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/InlineAsm.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/CallingConv.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Argument.h"
+#include "llvm/IR/Attributes.h"
+#include "llvm/IR/DerivedTypes.h"
 
 
 

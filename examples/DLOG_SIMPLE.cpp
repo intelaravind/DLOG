@@ -1,5 +1,19 @@
 #include "../DLOG.hpp"
 
+
+//define DLOG_DISABLE in DLOG.hpp or pass -DDLOG_DISABLE to disable the dlog.
+//Try the same example with DLOG_DISABLE. This option can be used for performance run, or
+//simply to disable dlog
+
+//Note: Be careful while creating a dlog object on a program point which is can be
+//reached multiple times (like functions and loops). DLOG object will only save the
+//info of last call. This is just like opening a file inside a function in write
+//mode. If you call the function multiple times you can only see the last output.
+//To overcome this either use
+//    static objects "staticDLOG dlog DLOG_CREATE("test.html");"
+//    or
+//    define it in  global space
+
 int main(int argc, char **argv)
 {
 	DLOG dbg DLOG_CREATE("DLOG_SIMPLE.html");
@@ -43,7 +57,7 @@ int main(int argc, char **argv)
 	//sometimes we want to add some info with some prints. This is very usefull in llvm mode
 	//This is done with the help of addon. Addon is a simple string which will be printed with the object
 
-	DLOG_PRINT(dbg, argv[0], "main", ADDON("this is the program name"));
+	DLOG_PRINT(dbg, "This is about DLOG...... A lot to tell, but no time to write", "main", ADDON("about DLOG"));
 
 	return 0;
 }

@@ -76,9 +76,10 @@ int main(int argc, char **argv)
 
 	//going to add tags
 	std::string line;
-	while (ftags >> line)
+	while (!ftags.eof())
 	{
 //		std::cout << line << "\n";
+		getline(ftags, line);
 		fwrite << line << '\n';
 	}
 	//end going to add tags

@@ -10,6 +10,7 @@
 
 #include "debug_common_headers.hpp"
 #include "DLOG_ADDON.hpp"
+#include "DLOG_RECOVERY.hpp"
 
 std::string mendl = "<br>\n";
 std::string br = "<br>";
