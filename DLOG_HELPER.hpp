@@ -9,6 +9,7 @@
 #define DLOG_HELPER_HPP_
 
 #include "debug_common_headers.hpp"
+#include "DLOG_ADDON.hpp"
 
 std::string mendl = "<br>\n";
 std::string br = "<br>";

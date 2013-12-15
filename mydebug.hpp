@@ -32,34 +32,7 @@ std::string br = "<br>";
 #define NBSP "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 #define CALLINFO "<span class='CALLINFO' id='CALLINFO' style=\"font-size:12px\">"<<NBSP<<RED(userfile)<<":"<<RED(lineno)<<"</span>\n"
 
-class ADDON {
-	std::string s;
 
-public:
-	ADDON() {
-		s = "";
-	}
-
-	ADDON(const std::string in) {
-		s = in;
-	}
-
-	void operator=(const std::string in) {
-		s = in;
-	}
-
-//	void operator=(const ADDON &obj) {
-//		s = obj.s;
-//	}
-
-	ADDON(const ADDON &obj) {
-		s = obj.s;
-	}
-
-	std::string getString() {
-		return s;
-	}
-};
 
 bool replace(std::string& str, const std::string& from, const std::string& to) {
 	size_t start_pos = str.find(from);

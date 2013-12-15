@@ -16,7 +16,7 @@
 #define DLOG_ENABLE
 
 //Dont delete the temp files
-#define DLOG_KEEP_TEMP_FILES 1
+#define DLOG_KEEP_TEMP_FILES 0
 
 //print the output to file
 #define DLOG_OUTPUT_FILE 1
@@ -72,7 +72,11 @@ public:
 	void tag_handler(std::string);
 
 	template<typename T>
-	void print(const char *, int, T);
+	void print(const char *, int, T, ADDON);
+	template<typename T>
+	void print(const char *, int, T, const char*, ADDON);
+
+	void set_output_mode(int);
 
 	void print();
 };
@@ -105,8 +109,6 @@ DLOG::DLOG(const char * userfile, int lineno, const char *OUT_FILE,
 	fdata.open(datatempPath.c_str(), std::fstream::out);
 	ftags.open(tagPath.c_str(), std::fstream::out);
 
-	//default tags
-	ftags << CHKBOX("SYSTEM");
 
 	//insert known tags to taglist
 	tag_handler("SYSTEM");
@@ -124,6 +126,7 @@ DLOG::~DLOG()
 
 	fdata << DIV("SYSTEM") << "Destroyed Debugger " << GREEN(id) << EDIV;
 	fdata.close();
+	ftags.close();
 
 	unsigned found = datatempPath.find_last_of("/\\");
 
@@ -132,9 +135,7 @@ DLOG::~DLOG()
 	if (status < 0)
 		std::cout << "DLOG Error: " << strerror(errno) << '\n';
 
-
-	syscommand = "$DLOG_PATH/DLOG_FINALIZER.out "
-			+ dataPath;
+	syscommand = "$DLOG_PATH/DLOG_FINALIZER.out " + dataPath;
 //	std::cout << syscommand<<"\n";
 	status = system(syscommand.c_str());
 	if (status < 0)
@@ -156,6 +157,15 @@ DLOG::~DLOG()
 }
 
 /**
+ * set output mode to file or stdout
+ * @param mode : DLOG output modes (DLOG_OUTPUT_FILE, DLOG_OUTPUT_STDOUT)
+ */
+void DLOG::set_output_mode(int mode)
+{
+	outputmode = mode;
+}
+
+/**
  * @brief adds the tag to the file if it does not exit
  * @param input : The input tag
  */
@@ -166,21 +176,48 @@ void DLOG::tag_handler(std::string input)
 	ret = tagset.insert(input);
 
 	//A new element was inserted so add it to file
-	if (ret.second)
+	if (ret.second==true && input.compare("CALLINFO")!=0)
 	{
-		tagset.insert("SYSTEM");
-		tagset.insert("CALLINFO");
+		ftags << CHKBOX(input);
+		ftags.flush();
 	}
 
 }
 
 template<typename T>
-void DLOG::print(const char *userfile, int lineno, T obj)
+void DLOG::print(const char *userfile, int lineno, T obj, ADDON addon = ADDON())
 {
-	tag_handler("notag");
-	fdata
-			<< DIV(
-					"notag") << br<< CALLINFO << NBSP << BOLD(" Data : <br>") << obj << EDIV;
+
+	if (outputmode == DLOG_OUTPUT_FILE)
+	{
+		tag_handler("notag");
+		fdata
+				<< DIV(
+						"notag") << br<< CALLINFO << NBSP << BOLD(" Data : <br>") << obj << EDIV;
+	}
+	else
+	{
+		std::cout << obj << "\n";
+	}
+
+	fdata.flush();
+}
+
+template<typename T>
+void DLOG::print(const char *userfile, int lineno, T obj, const char* tag,
+		ADDON addon = ADDON())
+{
+
+	if (outputmode == DLOG_OUTPUT_FILE)
+	{
+		tag_handler(tag);
+		fdata
+				<< DIV(tag) << BOLD("<br>Tag : ") << RED(tag) << NBSP  << br<< CALLINFO << NBSP << BOLD(" Data : <br>") << obj << EDIV;
+	}
+	else
+	{
+		std::cout << obj << "\n";
+	}
 
 	fdata.flush();
 }
