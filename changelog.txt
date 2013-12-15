@@ -1,0 +1,23 @@
+===========================================================================
+DLOG
+===========================================================================
+===========================================================================
+
+
+
+V 0.2
+======
+
+1. Crash support : Recover the output even if the original program crashed
+2. Works with any c++ program
+3. Multiple output modes : file, stdout, or both simultaneously. 
+4. Ability to switch output modes on the fly. You can choose where to output for each print (if you would like to do so)
+5. Bug fix: segfault
+6. Code cleaning
+7. Code cleaning (this is not an error, there was a lot of code cleaning)
+
+
+V 0.1
+=====
+
+The initial working version 
