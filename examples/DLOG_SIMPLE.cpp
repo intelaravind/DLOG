@@ -1,6 +1,6 @@
 #include "../DLOG.hpp"
 
-int main()
+int main(int argc, char **argv)
 {
 	DLOG dbg DLOG_CREATE("DLOG_SIMPLE.html");
 
@@ -39,6 +39,11 @@ int main()
 
 	dbg.set_output_mode(DLOG_OUTPUT_FILE);
 	DLOG_PRINT(dbg, "And we are back to file only mode");
+
+	//sometimes we want to add some info with some prints. This is very usefull in llvm mode
+	//This is done with the help of addon. Addon is a simple string which will be printed with the object
+
+	DLOG_PRINT(dbg, argv[0], "main", ADDON("this is the program name"));
 
 	return 0;
 }
