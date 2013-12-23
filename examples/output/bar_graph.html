@@ -1,3 +1,4 @@
+<h1>Table: fruits</h1>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>DLOG TABLE</title>
@@ -7,7 +8,61 @@
 <script type='text/javascript' src='js/modules/exporting.js'></script>
 </head>
 <body>
-<h1>Table: fruits</h1>
+<script type="text/javascript">
+(function($){
+$(function () {
+$('#containerfruits').highcharts({
+chart: {
+type: 'column'
+},
+title: {text: 'fruits'
+ },
+xAxis: {
+categories: [
+'sold',
+'stockleft',
+'somevalue',
+]
+},
+yAxis:
+{
+min: 0,
+title:
+{
+text: 'params'
+}
+},
+tooltip: {
+   headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+  pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+     '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+footerFormat: '</table>',
+shared: true,
+useHTML: true
+},
+plotOptions:
+{
+	column:
+	{
+		pointPadding: 0.2,
+		borderWidth: 0
+	}
+},
+series: [
+{
+name: 'Apple', data
+: [200,110,510,]},
+{
+name: 'Orange', data
+: [1200,120,530,]},
+{
+name: 'Coconut', data
+: [1440,130,520,]},
+]});
+});
+})(jQuery);
+</script></head>
+<body>
 <table cellpadding="0" cellspacing="0" border="0" id="fruits" class="sortable">
 <thead><tr>
 <th><h3>item</h3></th>
@@ -19,8 +74,8 @@
 <tr>
 <td>Apple</td>
 <td>200</td>
-<td>10</td>
-<td>50</td>
+<td>110</td>
+<td>510</td>
 </tr>
 <tr>
 <td>Orange</td>
@@ -29,41 +84,13 @@
 <td>530</td>
 </tr>
 <tr>
-<td>Grapes</td>
-<td>2040</td>
+<td>Coconut</td>
+<td>1440</td>
 <td>130</td>
 <td>520</td>
 </tr>
 </body>
-</table><h1>Table: cars</h1>
-<table cellpadding="0" cellspacing="0" border="0" id="cars" class="sortable">
-<thead><tr>
-<th><h3>item</h3></th>
-<th><h3>sold</h3></th>
-<th><h3>stockleft</h3></th>
-<th><h3>somevalue</h3></th>
-</tr></thead>
-<body>
-<tr>
-<td>Ferrari</td>
-<td>200</td>
-<td>10</td>
-<td>50</td>
-</tr>
-<tr>
-<td>Tata nano</td>
-<td>1200</td>
-<td>120</td>
-<td>530</td>
-</tr>
-<tr>
-<td>Jaguar</td>
-<td>2040</td>
-<td>130</td>
-<td>520</td>
-</tr>
-</body>
-</table><script type="text/javascript" src="tinytable/script.js"></script>
+</table><div id="containerfruits" style="max-width: 1024px; height: 400px; margin: 0 auto"></div><script type="text/javascript" src="tinytable/script.js"></script>
 <script type="text/javascript">
 var sorter = new TINY.table.sorter("sorter");
 sorter.head = "head";
@@ -77,7 +104,6 @@ sorter.paginate = false;
 sorter.currentid = "currentpage";
 sorter.limitid = "pagelimit";
 sorter.init("fruits",1);
-sorter.init("cars",1);
 </script>
 </body>
 </html>

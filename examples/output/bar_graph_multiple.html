@@ -1,0 +1,220 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>DLOG TABLE</title>
+<link rel="stylesheet" href="tinytable/style.css" />
+<script type='text/javascript' src='js/jquery-2.0.3.min.js'></script>
+<script type='text/javascript' src='js/highcharts.js'></script>
+<script type='text/javascript' src='js/modules/exporting.js'></script>
+</head>
+<body>
+<script type="text/javascript">
+(function($){
+$(function () {
+$('#containerfruits').highcharts({
+chart: {
+type: 'column'
+},
+title: {text: 'fruits'
+ },
+xAxis: {
+categories: [
+'sold',
+'stockleft',
+'somevalue',
+]
+},
+yAxis:
+{
+min: 0,
+title:
+{
+text: 'params'
+}
+},
+tooltip: {
+   headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+  pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+     '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+footerFormat: '</table>',
+shared: true,
+useHTML: true
+},
+plotOptions:
+{
+	column:
+	{
+		pointPadding: 0.2,
+		borderWidth: 0
+	}
+},
+series: [
+{
+name: 'Apple', data
+: [200,10,50,]},
+{
+name: 'Orange', data
+: [1200,120,530,]},
+{
+name: 'Grapes', data
+: [2040,130,520,]},
+]});
+});
+})(jQuery);
+</script><script type="text/javascript">
+(function($){
+$(function () {
+$('#containercars').highcharts({
+chart: {
+type: 'column'
+},
+title: {text: 'cars'
+ },
+xAxis: {
+categories: [
+'sold',
+'stockleft',
+'somevalue',
+]
+},
+yAxis:
+{
+min: 0,
+title:
+{
+text: 'params'
+}
+},
+tooltip: {
+   headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+  pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+     '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+footerFormat: '</table>',
+shared: true,
+useHTML: true
+},
+plotOptions:
+{
+	column:
+	{
+		pointPadding: 0.2,
+		borderWidth: 0
+	}
+},
+series: [
+{
+name: 'INR', data
+: [200,10,50,]},
+{
+name: 'USD', data
+: [10,10,50,]},
+{
+name: 'EUR', data
+: [2,13,15,]},
+]});
+});
+})(jQuery);
+</script></head>
+<body>
+<h1>Table: fruits</h1>
+<table cellpadding="0" cellspacing="0" border="0" id="fruits" class="sortable">
+<thead><tr>
+<th><h3>item</h3></th>
+<th><h3>sold</h3></th>
+<th><h3>stockleft</h3></th>
+<th><h3>somevalue</h3></th>
+</tr></thead>
+<body>
+<tr>
+<td>Apple</td>
+<td>200</td>
+<td>10</td>
+<td>50</td>
+</tr>
+<tr>
+<td>Orange</td>
+<td>1200</td>
+<td>120</td>
+<td>530</td>
+</tr>
+<tr>
+<td>Grapes</td>
+<td>2040</td>
+<td>130</td>
+<td>520</td>
+</tr>
+</body>
+</table><div id="containerfruits" style="max-width: 1024px; height: 400px; margin: 0 auto"></div><h1>Table: cars</h1>
+<table cellpadding="0" cellspacing="0" border="0" id="cars" class="sortable">
+<thead><tr>
+<th><h3>item</h3></th>
+<th><h3>sold</h3></th>
+<th><h3>stockleft</h3></th>
+<th><h3>somevalue</h3></th>
+</tr></thead>
+<body>
+<tr>
+<td>Ferrari</td>
+<td>200</td>
+<td>10</td>
+<td>50</td>
+</tr>
+<tr>
+<td>Tata nano</td>
+<td>1200</td>
+<td>120</td>
+<td>530</td>
+</tr>
+<tr>
+<td>Jaguar</td>
+<td>2040</td>
+<td>130</td>
+<td>520</td>
+</tr>
+</body>
+</table><h1>Table: cars</h1>
+<table cellpadding="0" cellspacing="0" border="0" id="cars" class="sortable">
+<thead><tr>
+<th><h3>item</h3></th>
+<th><h3>sold</h3></th>
+<th><h3>stockleft</h3></th>
+<th><h3>somevalue</h3></th>
+</tr></thead>
+<body>
+<tr>
+<td>INR</td>
+<td>200</td>
+<td>10</td>
+<td>50</td>
+</tr>
+<tr>
+<td>USD</td>
+<td>10</td>
+<td>10</td>
+<td>50</td>
+</tr>
+<tr>
+<td>EUR</td>
+<td>2</td>
+<td>13</td>
+<td>15</td>
+</tr>
+</body>
+</table><div id="containercars" style="max-width: 1024px; height: 400px; margin: 0 auto"></div><script type="text/javascript" src="tinytable/script.js"></script>
+<script type="text/javascript">
+var sorter = new TINY.table.sorter("sorter");
+sorter.head = "head";
+sorter.asc = "asc";
+sorter.desc = "desc";
+sorter.even = "evenrow";
+sorter.odd = "oddrow";
+sorter.evensel = "evenselected";
+sorter.oddsel = "oddselected";
+sorter.paginate = false;
+sorter.currentid = "currentpage";
+sorter.limitid = "pagelimit";
+sorter.init("fruits",1);
+sorter.init("cars",1);
+sorter.init("cars",1);
+</script>
+</body>
+</html>

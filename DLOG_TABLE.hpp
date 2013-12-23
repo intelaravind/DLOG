@@ -29,9 +29,12 @@ public:
 	std::vector<t_row> values;
 	std::string table_name;
 	int cur_row = 0;
+	int drawGraph = 0;
 	void table_dump();
 	void table_html_dump();
 	void table_html_dump_unwrap(std::fstream &, int);
+	void table_emit_graph_javascript(std::fstream &);
+	void table_emit_graph_div(std::fstream &);
 
 	DLOG_TABLE(const char *OUT_FILE, const char *tbl_name, std::string inpPath =
 			getenv("DLOG_OUTPUT_FOLDER"))
@@ -94,8 +97,17 @@ void table_html_header(std::fstream &fwrite)
 					"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n"
 					"<title>DLOG TABLE</title>\n"
 					"<link rel=\"stylesheet\" href=\"tinytable/style.css\" />\n"
+					"<script type='text/javascript' src='js/jquery-2.0.3.min.js'></script>\n"
+					"<script type='text/javascript' src='js/highcharts.js'></script>\n"
+					"<script type='text/javascript' src='js/modules/exporting.js'></script>\n"
 					"</head>\n"
 					"<body>\n";
+}
+
+void table_html_header_end(std::fstream &fwrite)
+{
+	fwrite << "</head>\n"
+			"<body>\n";
 }
 
 void table_html_footer(std::fstream &fwrite,
@@ -125,6 +137,92 @@ void table_html_footer(std::fstream &fwrite,
 
 }
 
+void DLOG_TABLE::table_emit_graph_div(std::fstream &fwrite)
+{
+	fwrite << "<div id=\"container" << table_name
+			<< "\" style=\"max-width: 1024px; height: 400px; margin: 0 auto\"></div>";
+}
+
+void DLOG_TABLE::table_emit_graph_javascript(std::fstream &fwrite)
+{
+	fwrite << "<script type=\"text/javascript\">\n"
+			"(function($){\n"
+			"$(function () {\n"
+			"$('#" << "container" << table_name << "').highcharts({\n"
+			"chart: {\n"
+			"type: 'column'\n"
+			"},\n"
+			"title: {"
+			"text: '" << table_name << "'\n"
+			" },\n"
+			"xAxis: {\n"
+			"categories: [\n";
+
+	int isfirst = 1;
+	for (auto temphead : table_head_row)
+	{
+		if (isfirst == 1)
+			isfirst = 0;
+		else
+			fwrite << "'" << temphead << "',\n";
+	}
+	fwrite
+			<< "]\n"
+					"},\n"
+					"yAxis:\n"
+					"{\n"
+					"min: 0,\n"
+					"title:\n"
+					"{\n"
+					"text: 'params'\n"
+					"}\n"
+					"},\n"
+					"tooltip: {\n"
+					"   headerFormat: '<span style=\"font-size:10px\">{point.key}</span><table>',\n"
+					"  pointFormat: '<tr><td style=\"color:{series.color};padding:0\">{series.name}: </td>' +\n"
+					"     '<td style=\"padding:0\"><b>{point.y:.1f} mm</b></td></tr>',\n"
+					"footerFormat: '</table>',\n"
+					"shared: true,\n"
+					"useHTML: true\n"
+					"},\n"
+					"plotOptions:\n"
+					"{\n"
+					"	column:\n"
+					"	{\n"
+					"		pointPadding: 0.2,\n"
+					"		borderWidth: 0\n"
+					"	}\n"
+					"},\n"
+					"series: [\n";
+
+	int rowindex = 0;
+	for (auto temprow : values)
+	{
+		fwrite << "{\n";
+		int isfirst = 1;
+		for (auto temval : temprow)
+		{
+			if (isfirst == 1)
+			{
+				fwrite << "name: '" << table_head_column.at(rowindex)
+						<< "', data\n: [";
+				fwrite << temval << ",";
+				isfirst = 0;
+				rowindex++;
+			}
+			else
+				fwrite << temval << ",";
+		}
+
+		fwrite << "]},\n";
+	}
+
+	fwrite << "]});\n"
+			"});\n"
+			"})(jQuery);\n"
+			"</script>";
+}
+
 void DLOG_TABLE::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 {
 
@@ -135,7 +233,15 @@ void DLOG_TABLE::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 	int i, j;
 
 	if (hold == 0)
+	{
 		table_html_header(fwrite);
+		if (drawGraph == 1)
+		{
+			table_emit_graph_javascript(fwrite);
+		}
+		table_html_header_end(fwrite);
+	}
+
 	fwrite << "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" id=\""
 			<< table_name << "\" class=\"sortable\">\n";
 
@@ -170,10 +276,15 @@ void DLOG_TABLE::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 
 	if (hold == 0)
 	{
+		if (drawGraph == 1)
+		{
+			table_emit_graph_div(fwrite);
+		}
 		std::vector<std::string> tempvec;
 		tempvec.push_back(table_name);
 		table_html_footer(fwrite, tempvec);
 		fwrite.close();
+
 	}
 
 	std::string syscommand;
@@ -231,6 +342,11 @@ public:
 		dataPath = inpPath + std::string(OUT_FILE);
 	}
 
+	void show_graph(TID tid)
+	{
+		tables.at(tid).drawGraph = 1;
+	}
+
 	TID newtable(const char *tablename)
 	{
 		DLOG_TABLE *temptable = new DLOG_TABLE(dataPath.c_str(), tablename);
@@ -254,15 +370,31 @@ public:
 		fwrite.open(dataPath.c_str(), std::fstream::out);
 
 		table_html_header(fwrite);
+		for (auto temptable : tables)
+		{
+			if (temptable.drawGraph == 1)
+			{
+				temptable.table_emit_graph_javascript(fwrite);
+			}
+		}
+		table_html_header_end(fwrite);
 		std::vector<std::string> names;
-
 		for (auto temptable : tables)
 		{
 			names.push_back(temptable.table_name);
 			temptable.table_html_dump_unwrap(fwrite, HOLD);
+			if (temptable.drawGraph == 1)
+			{
+				temptable.table_emit_graph_div(fwrite);
+			}
 		}
 
-		table_html_footer(fwrite,names);
+		for (auto temptable : tables)
+		{
+
+		}
+
+		table_html_footer(fwrite, names);
 	}
 
 };
