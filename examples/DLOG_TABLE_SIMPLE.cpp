@@ -18,10 +18,7 @@ using namespace std;
 int main()
 {
 	//if 3rd param is not given, environment variable DLOG_OUPUT_FOLDER is used
-	//2nd param can be NOHOLD or HOLD this is explained in the next table example
-	DLOG_TABLE table("DLOG_TABLE_SIMPLE.html",NOHOLD,"./output/");
-
-	table.table_name = "fruits";
+	DLOG_TABLE table("DLOG_TABLE_SIMPLE.html", "fruits", "./output/");
 
 	/*The header row*/
 	vector<string> head_row;
@@ -49,21 +46,14 @@ int main()
 
 	/*Row 3*/
 	vector<string> row3;
-	row3.push_back("Grapes");
+	row3.push_back("Coconut");
 	row3.push_back("2040");
 	row3.push_back("130");
 	row3.push_back("520");
 	table.insert_row(row3);
 
-
 	table.table_html_dump();
 
 	return 0;
 }
-
-
-
-
-
-
 

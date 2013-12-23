@@ -22,7 +22,6 @@ class DLOG_TABLE
 	std::set<std::string> set_table_col;
 	std::set<std::string> set_table_row;
 	std::string dataPath;
-	int finalizer;
 
 public:
 	std::vector<std::string> table_head_row;
@@ -32,12 +31,13 @@ public:
 	int cur_row = 0;
 	void table_dump();
 	void table_html_dump();
+	void table_html_dump_unwrap(std::fstream &, int);
 
-	DLOG_TABLE(const char *OUT_FILE, int finalizer, std::string inpPath =
+	DLOG_TABLE(const char *OUT_FILE, const char *tbl_name, std::string inpPath =
 			getenv("DLOG_OUTPUT_FOLDER"))
 	{
-		DLOG_TABLE::finalizer = finalizer;
 		dataPath = inpPath + std::string(OUT_FILE);
+		table_name = tbl_name;
 	}
 
 	void insert_head_row(std::vector<std::string> &inp)
@@ -98,7 +98,8 @@ void table_html_header(std::fstream &fwrite)
 					"<body>\n";
 }
 
-void table_html_footer(std::fstream &fwrite, std::string table_name)
+void table_html_footer(std::fstream &fwrite,
+		std::vector<std::string> table_name)
 {
 	fwrite
 			<< "<script type=\"text/javascript\" src=\"tinytable/script.js\"></script>\n"
@@ -113,17 +114,19 @@ void table_html_footer(std::fstream &fwrite, std::string table_name)
 					"sorter.oddsel = \"oddselected\";\n"
 					"sorter.paginate = false;\n"
 					"sorter.currentid = \"currentpage\";\n"
-					"sorter.limitid = \"pagelimit\";\n"
-					"sorter.init(\"" << table_name << "\",1);\n"
-			"</script>\n"
+					"sorter.limitid = \"pagelimit\";\n";
+	for (auto name : table_name)
+	{
+		fwrite << "sorter.init(\"" << name << "\",1);\n";
+	}
+	fwrite << "</script>\n"
 			"</body>\n"
 			"</html>\n";
+
 }
 
-void DLOG_TABLE::table_html_dump()
+void DLOG_TABLE::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 {
-	std::fstream fwrite;
-	fwrite.open(dataPath.c_str(), std::fstream::out);
 
 	fwrite << "<h1>Table: " << table_name << "</h1>" << "\n";
 
@@ -131,11 +134,8 @@ void DLOG_TABLE::table_html_dump()
 	unsigned int n_rows = table_head_column.size();
 	int i, j;
 
-	if (finalizer == 0)
-	{
+	if (hold == 0)
 		table_html_header(fwrite);
-	}
-
 	fwrite << "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" id=\""
 			<< table_name << "\" class=\"sortable\">\n";
 
@@ -168,19 +168,28 @@ void DLOG_TABLE::table_html_dump()
 	fwrite << "</body>" << "\n";
 	fwrite << "</table>";
 
-	if (finalizer == 0)
+	if (hold == 0)
 	{
-		table_html_footer(fwrite, table_name);
+		std::vector<std::string> tempvec;
+		tempvec.push_back(table_name);
+		table_html_footer(fwrite, tempvec);
+		fwrite.close();
 	}
-	fwrite.close();
 
 	std::string syscommand;
-		//copy the recovery script
-		unsigned found = dataPath.find_last_of("/\\");
-		syscommand = "cp -r $DLOG_PATH/tinytable " + dataPath.substr(0, found);
-		int status = system(syscommand.c_str());
-		if (status < 0)
-			std::cout << "DLOG Table Error: " << strerror(errno) << '\n';
+	//copy the recovery script
+	unsigned found = dataPath.find_last_of("/\\");
+	syscommand = "cp -r $DLOG_PATH/tinytable " + dataPath.substr(0, found);
+	int status = system(syscommand.c_str());
+	if (status < 0)
+		std::cout << "DLOG Table Error: " << strerror(errno) << '\n';
+}
+
+void DLOG_TABLE::table_html_dump()
+{
+	std::fstream fwrite;
+	fwrite.open(dataPath.c_str(), std::fstream::out);
+	table_html_dump_unwrap(fwrite, NOHOLD);
 }
 
 void DLOG_TABLE::table_dump()
@@ -209,5 +218,53 @@ void DLOG_TABLE::table_dump()
 	}
 	std::cout << "\n\n";
 }
+typedef int TID;
+class DLOG_TABLES
+{
+	std::vector<DLOG_TABLE> tables;
+	std::string dataPath;
+
+public:
+	DLOG_TABLES(const char *OUT_FILE,
+			std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
+	{
+		dataPath = inpPath + std::string(OUT_FILE);
+	}
+
+	TID newtable(const char *tablename)
+	{
+		DLOG_TABLE *temptable = new DLOG_TABLE(dataPath.c_str(), tablename);
+		tables.push_back(*temptable);
+		return TID(tables.size() - 1);
+	}
+
+	void insert_head_row(TID tid, std::vector<std::string> &inp)
+	{
+		tables.at(tid).insert_head_row(inp);
+	}
+
+	void insert_row(TID tid, std::vector<std::string> &inp)
+	{
+		tables.at(tid).insert_row(inp);
+	}
+
+	void html_dump()
+	{
+		std::fstream fwrite;
+		fwrite.open(dataPath.c_str(), std::fstream::out);
+
+		table_html_header(fwrite);
+		std::vector<std::string> names;
+
+		for (auto temptable : tables)
+		{
+			names.push_back(temptable.table_name);
+			temptable.table_html_dump_unwrap(fwrite, HOLD);
+		}
+
+		table_html_footer(fwrite,names);
+	}
+
+};
 
 #endif /* DLOG_TABLE_HPP_ */
