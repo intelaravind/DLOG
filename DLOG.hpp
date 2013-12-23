@@ -17,7 +17,6 @@
 #define DLOG_ENABLE
 #endif
 
-
 ///uncomment this line to enable llvm support
 //#define DLOG_LLVM_ENABLE
 
@@ -56,7 +55,8 @@ static int gid = 0;
 /**
  * DLOG main class
  */
-class DLOG {
+class DLOG
+{
 	std::string ErrorInfo;
 	std::string dataPath;
 	std::string tagPath;
@@ -79,7 +79,8 @@ public:
 	 * Empty constructor to do nothing;
 	 * Used mainly to disable DLOG
 	 */
-	DLOG() {
+	DLOG()
+	{
 
 	}
 
@@ -89,15 +90,104 @@ public:
 	void tag_handler(std::string);
 
 	template<typename T>
-	void print(const char *, int, T, ADDON);
+	void print(const char *userfile, int lineno, T obj, ADDON addon = ADDON())
+	{
+
+		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE)
+		{
+			tag_handler("notag");
+			fdata << DIV(
+					"notag") << br << CALLINFO << NBSP
+					<< BROWN(addon.getString()) << NBSP << BOLD(" Data : <br>")
+					<< obj << EDIV;
+		}
+
+		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_STDOUT)
+		{
+			if (addon.getString().length() != 0)
+				std::cout << "Addon: " << addon.getString() << "\n";
+			std::cout << obj << "\n";
+		}
+
+		fdata.flush();
+	}
 	template<typename T>
-	void print(const char *, int, T, const char*, ADDON);
+	void print(const char *userfile, int lineno, T obj, const char* tag,
+			ADDON addon = ADDON())
+	{
+
+		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE)
+
+		{
+			tag_handler(tag);
+			fdata << DIV(
+					tag) << BOLD("<br>Tag : ") << RED(tag) << NBSP << br
+					<< CALLINFO << BROWN(addon.getString()) << NBSP << NBSP
+					<< BOLD(" Data : <br>") << obj << EDIV;
+		}
+		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_STDOUT)
+		{
+			std::cout << "Tag : " << tag << "\t";
+			if (addon.getString().length() != 0)
+				std::cout << "\t Addon: " << addon.getString() << "\n";
+			std::cout << obj << "\n";
+		}
+
+		fdata.flush();
+	}
 
 #ifdef DLOG_LLVM_ENABLE
 	template<typename T>
-	void llvm_print(const char *, int, T&, ADDON);
+	void llvm_print(const char *userfile, int lineno, T &obj, ADDON addon =
+			ADDON())
+	{
+		std::string unformatted = llvm_to_str(*obj);
+		std::string formatted = dlog_format_llvm(unformatted);
+
+		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE)
+		{
+			tag_handler("notag");
+			fdata << DIV("notag") << br << CALLINFO << NBSP
+			<< BROWN(addon.getString()) << NBSP << BOLD(" Data : <br>")
+			<< formatted << EDIV;
+		}
+
+		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_STDOUT)
+		{
+			if (addon.getString().length() != 0)
+			std::cout << "Addon: " << addon.getString() << "\n";
+			std::cout << unformatted << "\n";
+		}
+
+		fdata.flush();
+	}
 	template<typename T>
-	void llvm_print(const char *, int, T&, const char*, ADDON);
+	void llvm_print(const char *userfile, int lineno, T &obj, const char* tag,
+			ADDON addon = ADDON())
+	{
+
+		std::string unformatted = llvm_to_str(obj);
+		std::string formatted = dlog_format_llvm(unformatted);
+
+		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE)
+
+		{
+			tag_handler(tag);
+			fdata << DIV(
+					tag) << BOLD("<br>Tag : ") << RED(tag) << NBSP << br << CALLINFO
+			<< BROWN(addon.getString()) << NBSP << NBSP
+			<< BOLD(" Data : <br>") << formatted << EDIV;
+		}
+		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_STDOUT)
+		{
+			std::cout << "Tag : " << tag << "\t";
+			if (addon.getString().length() != 0)
+			std::cout << "\t Addon: " << addon.getString() << "\n";
+			std::cout << unformatted << "\n";
+		}
+
+		fdata.flush();
+	}
 #endif
 
 	void set_output_mode(int);
@@ -113,7 +203,8 @@ public:
  * @param inpPath : The path of output file. If none is given the environment variable DLOG_OUTPUT_FOLDER is used
  */
 DLOG::DLOG(const char * userfile, int lineno, const char *OUT_FILE,
-		std::string inpPath = getenv("DLOG_OUTPUT_FOLDER")) {
+		std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
+{
 	DLOG::dataPath = inpPath + std::string(OUT_FILE);
 
 //	std::cout << dataPath << "\n";
@@ -137,7 +228,7 @@ DLOG::DLOG(const char * userfile, int lineno, const char *OUT_FILE,
 	tag_handler("CALLINFO");
 
 	fdata << DIV("SYSTEM") << "Created Debugger " << GREEN(id) << CALLINFO
-	<< EDIV;
+			<< EDIV;
 	id = gid++;
 
 	std::string syscommand;
@@ -149,7 +240,8 @@ DLOG::DLOG(const char * userfile, int lineno, const char *OUT_FILE,
 		std::cout << "DLOG Error: " << strerror(errno) << '\n';
 }
 
-DLOG::~DLOG() {
+DLOG::~DLOG()
+{
 	std::string syscommand;
 	int status;
 
@@ -189,7 +281,8 @@ DLOG::~DLOG() {
  * set output mode to file or stdout
  * @param mode : DLOG output modes (DLOG_OUTPUT_FILE, DLOG_OUTPUT_STDOUT, DLOG_OUTPUT_BOTH)
  */
-void DLOG::set_output_mode(int mode) {
+void DLOG::set_output_mode(int mode)
+{
 	outputmode = mode;
 }
 
@@ -197,115 +290,26 @@ void DLOG::set_output_mode(int mode) {
  * @brief adds the tag to the file if it does not exit
  * @param input : The input tag
  */
-void DLOG::tag_handler(std::string input) {
+void DLOG::tag_handler(std::string input)
+{
 
 	std::pair<std::set<std::string>::iterator, bool> ret;
 	ret = tagset.insert(input);
 
 	//A new element was inserted so add it to file
-	if (ret.second == true && input.compare("CALLINFO") != 0) {
+	if (ret.second == true && input.compare("CALLINFO") != 0)
+	{
 		ftags << CHKBOX(input);
 		ftags.flush();
 	}
 
 }
 
-template<typename T>
-void DLOG::print(const char *userfile, int lineno, T obj, ADDON addon =
-		ADDON()) {
-
-	if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE) {
-		tag_handler("notag");
-		fdata
-				<< DIV(
-						"notag") << br<< CALLINFO << NBSP << BROWN(addon.getString()) << NBSP << BOLD(" Data : <br>") << obj << EDIV;
-	}
-
-	if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_STDOUT) {
-		if (addon.getString().length() != 0)
-			std::cout << "Addon: " << addon.getString() << "\n";
-		std::cout << obj << "\n";
-	}
-
-	fdata.flush();
-}
-
-template<typename T>
-void DLOG::print(const char *userfile, int lineno, T obj, const char* tag,
-		ADDON addon = ADDON()) {
-
-	if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE)
-
-	{
-		tag_handler(tag);
-		fdata
-				<< DIV(
-						tag) << BOLD("<br>Tag : ") << RED(tag) << NBSP << br<< CALLINFO << BROWN(addon.getString()) << NBSP<< NBSP << BOLD(" Data : <br>") << obj << EDIV;
-	}
-	if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_STDOUT) {
-		std::cout << "Tag : " << tag << "\t";
-		if (addon.getString().length() != 0)
-			std::cout << "\t Addon: " << addon.getString() << "\n";
-		std::cout << obj << "\n";
-	}
-
-	fdata.flush();
-}
-
-#ifdef DLOG_LLVM_ENABLE
-template<typename T>
-void DLOG::llvm_print(const char *userfile, int lineno, T &obj, ADDON addon =
-		ADDON()) {
-	std::string unformatted = llvm_to_str(*obj);
-	std::string formatted = dlog_format_llvm(unformatted);
-
-	if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE) {
-		tag_handler("notag");
-		fdata << DIV("notag") << br << CALLINFO << NBSP
-		<< BROWN(addon.getString()) << NBSP << BOLD(" Data : <br>")
-		<< formatted << EDIV;
-	}
-
-	if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_STDOUT) {
-		if (addon.getString().length() != 0)
-			std::cout << "Addon: " << addon.getString() << "\n";
-		std::cout << unformatted << "\n";
-	}
-
-	fdata.flush();
-}
-
-template<typename T>
-void DLOG::llvm_print(const char *userfile, int lineno, T &obj, const char* tag,
-		ADDON addon = ADDON()) {
-
-	std::string unformatted = llvm_to_str(obj);
-	std::string formatted = dlog_format_llvm(unformatted);
-
-	if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE)
-
-	{
-		tag_handler(tag);
-		fdata
-				<< DIV(
-						tag) << BOLD("<br>Tag : ") << RED(tag) << NBSP << br<< CALLINFO << BROWN(addon.getString()) << NBSP<< NBSP << BOLD(" Data : <br>") << formatted << EDIV;
-	}
-	if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_STDOUT)
-	{
-		std::cout << "Tag : " << tag << "\t";
-		if (addon.getString().length() != 0)
-			std::cout << "\t Addon: " << addon.getString() << "\n";
-		std::cout << unformatted << "\n";
-	}
-
-	fdata.flush();
-}
-#endif
-
 /**
  * Does nothing. Used mainly for disabling DLOG
  */
-void DLOG::print() {
+void DLOG::print()
+{
 
 }
 
