@@ -30,7 +30,7 @@ int main()
 		head_row.push_back("sold");
 		head_row.push_back("stockleft");
 		head_row.push_back("somevalue");
-		tables.insert_head_row(table_fruits, head_row);
+		tables.insert_row(table_fruits, head_row);
 
 		/*Row 1*/
 		vector<string> row1;
@@ -68,7 +68,7 @@ int main()
 		head_row.push_back("sold");
 		head_row.push_back("stockleft");
 		head_row.push_back("somevalue");
-		tables.insert_head_row(table_cars, head_row);
+		tables.insert_row(table_cars, head_row);
 
 		/*Row 1*/
 		vector<string> row1;

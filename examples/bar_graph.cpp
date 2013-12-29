@@ -30,7 +30,7 @@ int main()
 	head_row.push_back("sold");
 	head_row.push_back("stockleft");
 	head_row.push_back("somevalue");
-	table.insert_head_row(head_row);
+	table.insert_row(head_row);
 
 	/*Row 1*/
 	vector<string> row1;

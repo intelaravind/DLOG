@@ -26,7 +26,7 @@ int main()
 	head_row.push_back("sold");
 	head_row.push_back("stockleft");
 	head_row.push_back("somevalue");
-	table.insert_head_row(head_row);
+	table.insert_row(head_row);
 
 	/*Row 1*/
 	vector<string> row1;
@@ -53,6 +53,7 @@ int main()
 	table.insert_row(row3);
 
 	table.table_html_dump();
+//	table.table_dump();
 
 	return 0;
 }

@@ -19,8 +19,6 @@ typedef std::vector<std::string> t_row;
 class DLOG_TABLE
 {
 
-	std::set<std::string> set_table_col;
-	std::set<std::string> set_table_row;
 	std::string dataPath;
 
 public:
@@ -43,51 +41,33 @@ public:
 		table_name = tbl_name;
 	}
 
-	void insert_head_row(std::vector<std::string> &inp)
-	{
-		for (auto iter : inp)
-		{
-			table_head_row.push_back(iter);
-			set_table_row.insert(iter);
-		}
-	}
 	void insert_row(std::vector<std::string> &inp)
 	{
 		t_row temp_values;
-		int i = 0;
 		for (auto iter : inp)
 		{
-			if (i == 0)
-			{
-				table_head_column.push_back(iter);
-				set_table_col.insert(iter);
-				i++;
-			}
-			else
-			{
-				temp_values.push_back(iter);
-			}
+			temp_values.push_back(iter);
 		}
 		values.push_back(temp_values);
 	}
 
-	void insert_in_head_row(std::string inp)
-	{
-		if (set_table_row.find(inp) == set_table_row.end())
-		{
-			table_head_row.push_back(inp);
-			set_table_row.insert(inp);
-		}
-	}
-	void insert_in_head_col(std::string inp)
-	{
-		if (set_table_col.find(inp) == set_table_col.end())
-		{
-			table_head_column.push_back(inp);
-			set_table_col.insert(inp);
-		}
-
-	}
+//	void insert_in_head_row(std::string inp)
+//	{
+//		if (set_table_row.find(inp) == set_table_row.end())
+//		{
+//			table_head_row.push_back(inp);
+//			set_table_row.insert(inp);
+//		}
+//	}
+//	void insert_in_head_col(std::string inp)
+//	{
+//		if (set_table_col.find(inp) == set_table_col.end())
+//		{
+//			table_head_column.push_back(inp);
+//			set_table_col.insert(inp);
+//		}
+//
+//	}
 };
 
 void table_html_header(std::fstream &fwrite)
@@ -158,8 +138,9 @@ void DLOG_TABLE::table_emit_graph_javascript(std::fstream &fwrite)
 			"xAxis: {\n"
 			"categories: [\n";
 
+	//The column is item (this is not a category. So skip it.
 	int isfirst = 1;
-	for (auto temphead : table_head_row)
+	for (auto temphead : values.at(0))
 	{
 		if (isfirst == 1)
 			isfirst = 0;
@@ -198,15 +179,15 @@ void DLOG_TABLE::table_emit_graph_javascript(std::fstream &fwrite)
 	int rowindex = 0;
 	for (auto temprow : values)
 	{
+		if(temprow == values.at(0))
+			continue;
 		fwrite << "{\n";
 		int isfirst = 1;
 		for (auto temval : temprow)
 		{
 			if (isfirst == 1)
 			{
-				fwrite << "name: '" << table_head_column.at(rowindex)
-						<< "', data\n: [";
-				fwrite << temval << ",";
+				fwrite << "name: '" << temval << "', data\n: [";
 				isfirst = 0;
 				rowindex++;
 			}
@@ -228,8 +209,8 @@ void DLOG_TABLE::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 
 	fwrite << "<h1>Table: " << table_name << "</h1>" << "\n";
 
-	unsigned int n_cols = table_head_row.size();
-	unsigned int n_rows = table_head_column.size();
+	unsigned int n_cols = (values.at(0)).size();
+	unsigned int n_rows = values.size();
 	int i, j;
 
 	if (hold == 0)
@@ -249,19 +230,16 @@ void DLOG_TABLE::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 	for (i = 0; i < n_cols; i++)
 	{
 		fwrite << "<th><h3>";
-		fwrite << table_head_row.at(i);
+		fwrite << (values.at(0)).at(i);
 		fwrite << "</h3></th>\n";
 	}
 	fwrite << "</tr></thead>" << "\n";
 
 	fwrite << "<body>" << "\n";
 
-	for (i = 0; i < n_rows; i++)
+	for (i = 1; i < n_rows; i++)
 	{
 		fwrite << "<tr>" << "\n";
-		fwrite << "<td>";
-		fwrite << table_head_column.at(i);
-		fwrite << "</td>" << "\n";
 		t_row *row = &values.at(i);
 		for (j = 0; j < row->size(); j++)
 		{
@@ -306,20 +284,12 @@ void DLOG_TABLE::table_html_dump()
 void DLOG_TABLE::table_dump()
 {
 	std::cout << "Table: " << table_name << "\n";
-	unsigned int n_cols = table_head_row.size();
-	unsigned int n_rows = table_head_column.size();
+	unsigned int n_cols = (values.at(0)).size();
+	unsigned int n_rows = values.size();
 	int i, j;
-
-	for (i = 0; i < n_cols; i++)
-	{
-		std::cout << table_head_row.at(i) << "\t\t";
-	}
-
-	std::cout << "\n";
 
 	for (i = 0; i < n_rows; i++)
 	{
-		std::cout << table_head_column.at(i) << "\t\t";
 		t_row *row = &values.at(i);
 		for (j = 0; j < row->size(); j++)
 		{
@@ -349,14 +319,16 @@ public:
 
 	TID newtable(const char *tablename)
 	{
+
 		DLOG_TABLE *temptable = new DLOG_TABLE(dataPath.c_str(), tablename);
 		tables.push_back(*temptable);
 		return TID(tables.size() - 1);
+		return 0;
 	}
 
 	void insert_head_row(TID tid, std::vector<std::string> &inp)
 	{
-		tables.at(tid).insert_head_row(inp);
+//		tables.at(tid).insert_head_row(inp);
 	}
 
 	void insert_row(TID tid, std::vector<std::string> &inp)
@@ -387,11 +359,6 @@ public:
 			{
 				temptable.table_emit_graph_div(fwrite);
 			}
-		}
-
-		for (auto temptable : tables)
-		{
-
 		}
 
 		table_html_footer(fwrite, names);
