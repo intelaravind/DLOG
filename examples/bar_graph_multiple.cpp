@@ -103,7 +103,7 @@ int main()
 
 	//table 3
 	{
-		TID table_currency = tables.newtable("cars");
+		TID table_currency = tables.newtable("currency");
 
 		/*The header row*/
 		vector<string> head_row;

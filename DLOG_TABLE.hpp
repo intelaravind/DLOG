@@ -73,15 +73,15 @@ public:
 void table_html_header(std::fstream &fwrite)
 {
 	fwrite
-			<< "<head>\n"
+			<< "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
+					"<html>\n"
+					"<head>\n"
 					"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n"
 					"<title>DLOG TABLE</title>\n"
 					"<link rel=\"stylesheet\" href=\"tinytable/style.css\" />\n"
 					"<script type='text/javascript' src='js/jquery-2.0.3.min.js'></script>\n"
 					"<script type='text/javascript' src='js/highcharts.js'></script>\n"
-					"<script type='text/javascript' src='js/modules/exporting.js'></script>\n"
-					"</head>\n"
-					"<body>\n";
+					"<script type='text/javascript' src='js/modules/exporting.js'></script>\n";
 }
 
 void table_html_header_end(std::fstream &fwrite)
@@ -95,21 +95,25 @@ void table_html_footer(std::fstream &fwrite,
 {
 	fwrite
 			<< "<script type=\"text/javascript\" src=\"tinytable/script.js\"></script>\n"
-					"<script type=\"text/javascript\">\n"
-					"var sorter = new TINY.table.sorter(\"sorter\");\n"
-					"sorter.head = \"head\";\n"
-					"sorter.asc = \"asc\";\n"
-					"sorter.desc = \"desc\";\n"
-					"sorter.even = \"evenrow\";\n"
-					"sorter.odd = \"oddrow\";\n"
-					"sorter.evensel = \"evenselected\";\n"
-					"sorter.oddsel = \"oddselected\";\n"
-					"sorter.paginate = false;\n"
-					"sorter.currentid = \"currentpage\";\n"
-					"sorter.limitid = \"pagelimit\";\n";
+					"<script type=\"text/javascript\">\n";
+
 	for (auto name : table_name)
 	{
-		fwrite << "sorter.init(\"" << name << "\",1);\n";
+		fwrite << "var "<< name <<"sorter = new TINY.table.sorter(\""<< name <<"sorter\");\n" << name
+				<< "sorter.head = \"head\";\n" << name
+				<< "sorter.asc = \"asc\";\n" << name
+				<< "sorter.desc = \"desc\";\n" << name
+				<< "sorter.even = \"evenrow\";\n" << name
+				<< "sorter.odd = \"oddrow\";\n" << name
+				<< "sorter.evensel = \"evenselected\";\n" << name
+				<< "sorter.oddsel = \"oddselected\";\n" << name
+				<< "sorter.paginate = false;\n" << name
+				<< "sorter.currentid = \"currentpage\";\n" << name
+				<< "sorter.limitid = \"pagelimit\";\n";
+
+		fwrite << name << "sorter.init(\"" << name << "\",1);\n";
+
+		fwrite<<"\n";
 	}
 	fwrite << "</script>\n"
 			"</body>\n"
@@ -179,7 +183,7 @@ void DLOG_TABLE::table_emit_graph_javascript(std::fstream &fwrite)
 	int rowindex = 0;
 	for (auto temprow : values)
 	{
-		if(temprow == values.at(0))
+		if (temprow == values.at(0))
 			continue;
 		fwrite << "{\n";
 		int isfirst = 1;
@@ -235,8 +239,6 @@ void DLOG_TABLE::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 	}
 	fwrite << "</tr></thead>" << "\n";
 
-	fwrite << "<body>" << "\n";
-
 	for (i = 1; i < n_rows; i++)
 	{
 		fwrite << "<tr>" << "\n";
@@ -249,8 +251,7 @@ void DLOG_TABLE::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 		}
 		fwrite << "</tr>" << "\n";
 	}
-	fwrite << "</body>" << "\n";
-	fwrite << "</table>";
+	fwrite << "</table>\n";
 
 	if (hold == 0)
 	{

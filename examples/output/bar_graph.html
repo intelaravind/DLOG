@@ -1,4 +1,6 @@
 <h1>Table: fruits</h1>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>DLOG TABLE</title>
@@ -6,8 +8,6 @@
 <script type='text/javascript' src='js/jquery-2.0.3.min.js'></script>
 <script type='text/javascript' src='js/highcharts.js'></script>
 <script type='text/javascript' src='js/modules/exporting.js'></script>
-</head>
-<body>
 <script type="text/javascript">
 (function($){
 $(function () {
@@ -70,7 +70,6 @@ name: 'Coconut', data
 <th><h3>stockleft</h3></th>
 <th><h3>somevalue</h3></th>
 </tr></thead>
-<body>
 <tr>
 <td>Apple</td>
 <td>200</td>
@@ -89,21 +88,22 @@ name: 'Coconut', data
 <td>130</td>
 <td>520</td>
 </tr>
-</body>
-</table><div id="containerfruits" style="max-width: 1024px; height: 400px; margin: 0 auto"></div><script type="text/javascript" src="tinytable/script.js"></script>
+</table>
+<div id="containerfruits" style="max-width: 1024px; height: 400px; margin: 0 auto"></div><script type="text/javascript" src="tinytable/script.js"></script>
 <script type="text/javascript">
-var sorter = new TINY.table.sorter("sorter");
-sorter.head = "head";
-sorter.asc = "asc";
-sorter.desc = "desc";
-sorter.even = "evenrow";
-sorter.odd = "oddrow";
-sorter.evensel = "evenselected";
-sorter.oddsel = "oddselected";
-sorter.paginate = false;
-sorter.currentid = "currentpage";
-sorter.limitid = "pagelimit";
-sorter.init("fruits",1);
+var fruitssorter = new TINY.table.sorter("fruitssorter");
+fruitssorter.head = "head";
+fruitssorter.asc = "asc";
+fruitssorter.desc = "desc";
+fruitssorter.even = "evenrow";
+fruitssorter.odd = "oddrow";
+fruitssorter.evensel = "evenselected";
+fruitssorter.oddsel = "oddselected";
+fruitssorter.paginate = false;
+fruitssorter.currentid = "currentpage";
+fruitssorter.limitid = "pagelimit";
+fruitssorter.init("fruits",1);
+
 </script>
 </body>
 </html>
