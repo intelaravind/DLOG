@@ -51,6 +51,16 @@ public:
 		values.push_back(temp_values);
 	}
 
+	void insert_head_row(std::vector<std::string> &inp)
+	{
+		t_row temp_values;
+		for (auto iter : inp)
+		{
+			temp_values.push_back(iter);
+		}
+		values.insert(values.begin(), temp_values);
+	}
+
 //	void insert_in_head_row(std::string inp)
 //	{
 //		if (set_table_row.find(inp) == set_table_row.end())
@@ -99,8 +109,8 @@ void table_html_footer(std::fstream &fwrite,
 
 	for (auto name : table_name)
 	{
-		fwrite << "var "<< name <<"sorter = new TINY.table.sorter(\""<< name <<"sorter\");\n" << name
-				<< "sorter.head = \"head\";\n" << name
+		fwrite << "var " << name << "sorter = new TINY.table.sorter(\"" << name
+				<< "sorter\");\n" << name << "sorter.head = \"head\";\n" << name
 				<< "sorter.asc = \"asc\";\n" << name
 				<< "sorter.desc = \"desc\";\n" << name
 				<< "sorter.even = \"evenrow\";\n" << name
@@ -113,7 +123,7 @@ void table_html_footer(std::fstream &fwrite,
 
 		fwrite << name << "sorter.init(\"" << name << "\",1);\n";
 
-		fwrite<<"\n";
+		fwrite << "\n";
 	}
 	fwrite << "</script>\n"
 			"</body>\n"
@@ -304,7 +314,9 @@ typedef int TID;
 class DLOG_TABLES
 {
 	std::vector<DLOG_TABLE> tables;
+	std::vector<int> header_row_populated;
 	std::string dataPath;
+
 
 public:
 	DLOG_TABLES(const char *OUT_FILE,
@@ -323,13 +335,18 @@ public:
 
 		DLOG_TABLE *temptable = new DLOG_TABLE(dataPath.c_str(), tablename);
 		tables.push_back(*temptable);
+		header_row_populated.push_back(0);
 		return TID(tables.size() - 1);
 		return 0;
 	}
 
 	void insert_head_row(TID tid, std::vector<std::string> &inp)
 	{
-//		tables.at(tid).insert_head_row(inp);
+		if (header_row_populated[tid]==0)
+		{
+			tables.at(tid).insert_head_row(inp);
+			header_row_populated[tid] = 1;
+		}
 	}
 
 	void insert_row(TID tid, std::vector<std::string> &inp)
