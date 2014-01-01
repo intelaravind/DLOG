@@ -10,11 +10,24 @@
 
 #include "debug_common_headers.hpp"
 #include "DLOG_HELPER.hpp"
+#include <boost/regex.hpp>
 
 #define NOHOLD 0
 #define HOLD 1
 
 typedef std::vector<std::string> t_row;
+
+std::string filter_string(std::string inp)
+{
+	std::string output = "";
+	for (auto ch : inp)
+	{
+		if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+				|| (ch >= '0' && ch <= '9'))
+			output = output + ch;
+	}
+	return output;
+}
 
 class DLOG_TABLE
 {
@@ -107,8 +120,9 @@ void table_html_footer(std::fstream &fwrite,
 			<< "<script type=\"text/javascript\" src=\"tinytable/script.js\"></script>\n"
 					"<script type=\"text/javascript\">\n";
 
-	for (auto name : table_name)
+	for (auto names : table_name)
 	{
+		std::string name = filter_string(names);
 		fwrite << "var " << name << "sorter = new TINY.table.sorter(\"" << name
 				<< "sorter\");\n" << name << "sorter.head = \"head\";\n" << name
 				<< "sorter.asc = \"asc\";\n" << name
@@ -133,8 +147,8 @@ void table_html_footer(std::fstream &fwrite,
 
 void DLOG_TABLE::table_emit_graph_div(std::fstream &fwrite)
 {
-	fwrite << "<div id=\"container" << table_name
-			<< "\" style=\"max-width: 1024px; height: 400px; margin: 0 auto\"></div>";
+	fwrite << "<div id=\"container" << filter_string(table_name)
+			<< "\" style=\"max-width: 1024px; height: 400px; margin: 0 auto\"></div>\n";
 }
 
 void DLOG_TABLE::table_emit_graph_javascript(std::fstream &fwrite)
@@ -142,15 +156,17 @@ void DLOG_TABLE::table_emit_graph_javascript(std::fstream &fwrite)
 	fwrite << "<script type=\"text/javascript\">\n"
 			"(function($){\n"
 			"$(function () {\n"
-			"$('#" << "container" << table_name << "').highcharts({\n"
-			"chart: {\n"
-			"type: 'column'\n"
-			"},\n"
-			"title: {"
-			"text: '" << table_name << "'\n"
-			" },\n"
-			"xAxis: {\n"
-			"categories: [\n";
+			"$('#" << "container" << filter_string(table_name)
+			<< "').highcharts({\n"
+					"chart: {\n"
+					"type: 'column',\n"
+					"zoomType: 'xy'\n"
+					"},\n"
+					"title: {"
+					"text: '" << table_name << "'\n"
+					" },\n"
+					"xAxis: {\n"
+					"categories: [\n";
 
 	//The column is item (this is not a category. So skip it.
 	int isfirst = 1;
@@ -175,7 +191,7 @@ void DLOG_TABLE::table_emit_graph_javascript(std::fstream &fwrite)
 					"tooltip: {\n"
 					"   headerFormat: '<span style=\"font-size:10px\">{point.key}</span><table>',\n"
 					"  pointFormat: '<tr><td style=\"color:{series.color};padding:0\">{series.name}: </td>' +\n"
-					"     '<td style=\"padding:0\"><b>{point.y:.1f} mm</b></td></tr>',\n"
+					"     '<td style=\"padding:0\"><b>{point.y:.1f} </b></td></tr>',\n"
 					"footerFormat: '</table>',\n"
 					"shared: true,\n"
 					"useHTML: true\n"
@@ -238,7 +254,7 @@ void DLOG_TABLE::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 	}
 
 	fwrite << "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" id=\""
-			<< table_name << "\" class=\"sortable\">\n";
+			<< filter_string(table_name) << "\" class=\"sortable\">\n";
 
 	fwrite << "<thead><tr>" << "\n";
 	for (i = 0; i < n_cols; i++)
@@ -317,7 +333,6 @@ class DLOG_TABLES
 	std::vector<int> header_row_populated;
 	std::string dataPath;
 
-
 public:
 	DLOG_TABLES(const char *OUT_FILE,
 			std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
@@ -342,7 +357,7 @@ public:
 
 	void insert_head_row(TID tid, std::vector<std::string> &inp)
 	{
-		if (header_row_populated[tid]==0)
+		if (header_row_populated[tid] == 0)
 		{
 			tables.at(tid).insert_head_row(inp);
 			header_row_populated[tid] = 1;
@@ -362,7 +377,9 @@ public:
 		table_html_header(fwrite);
 		for (auto temptable : tables)
 		{
-			if (temptable.drawGraph == 1)
+			if (temptable.values.size() == 0)
+				continue;
+			else if (temptable.drawGraph == 1)
 			{
 				temptable.table_emit_graph_javascript(fwrite);
 			}
@@ -371,11 +388,16 @@ public:
 		std::vector<std::string> names;
 		for (auto temptable : tables)
 		{
-			names.push_back(temptable.table_name);
-			temptable.table_html_dump_unwrap(fwrite, HOLD);
-			if (temptable.drawGraph == 1)
+			if (temptable.values.size() == 0)
+				continue;
+			else
 			{
-				temptable.table_emit_graph_div(fwrite);
+				names.push_back(temptable.table_name);
+				temptable.table_html_dump_unwrap(fwrite, HOLD);
+				if (temptable.drawGraph == 1)
+				{
+					temptable.table_emit_graph_div(fwrite);
+				}
 			}
 		}
 
