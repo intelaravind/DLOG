@@ -3,10 +3,16 @@
  *
  *  Created on: Dec 23, 2013
  *      Author: aravind-local
+ *
  */
 
 /*
  * compile with g++ DLOG_TABLE_SIMPLE.cpp -std=c++11
+ */
+
+/*
+ * See DLOG_TABLE_SIMPLE2_Multiple.cpp for multiple tables
+ * See DLOG_TABLE_MAP_SIMPLE.cpp for a flexible table
  */
 
 #include "../DLOG_TABLE.hpp"

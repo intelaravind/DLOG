@@ -18,6 +18,8 @@
 #include <vector>
 #include <errno.h>
 #include <string.h>
+#include <map>
+#include <utility>
 
 
 #endif /* DEBUG_COMMON_HEADERS_HPP_ */

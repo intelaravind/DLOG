@@ -9,11 +9,18 @@
  * compile with g++ DLOG_TABLE_SIMPLE2_Multiple.cpp -std=c++11
  */
 
+/*
+ * See DLOG_TABLE_MAP_SIMPLE2_Multiple.cpp for a flexible table
+ */
+
 #include "../DLOG_TABLE.hpp"
 #include <vector>
 
 //NOTE: DLOG_TABLE do not have crash support
 using namespace std;
+
+
+
 
 int main()
 {

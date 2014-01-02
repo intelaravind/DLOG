@@ -8,34 +8,89 @@
 <script type='text/javascript' src='js/jquery-2.0.3.min.js'></script>
 <script type='text/javascript' src='js/highcharts.js'></script>
 <script type='text/javascript' src='js/modules/exporting.js'></script>
-</head>
+<script type="text/javascript">
+(function($){
+$(function () {
+$('#containerfruits').highcharts({
+chart: {
+type: 'column',
+zoomType: 'xy'
+},
+title: {text: 'fruits'
+ },
+xAxis: {
+categories: [
+'sold',
+'somevalue',
+'stockleft',
+]
+},
+yAxis:
+{
+min: 0,
+title:
+{
+text: 'params'
+}
+},
+tooltip: {
+   headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+  pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+     '<td style="padding:0"><b>{point.y:.1f} </b></td></tr>',
+footerFormat: '</table>',
+shared: true,
+useHTML: true
+},
+plotOptions:
+{
+	column:
+	{
+		pointPadding: 0.2,
+		borderWidth: 0
+	}
+},
+series: [
+{
+name: 'Apple', data
+: [100,50,20,]},
+{
+name: 'Coconut', data
+: [120,25,10,]},
+{
+name: 'Orange', data
+: [130,-17,]},
+]});
+});
+})(jQuery);
+</script></head>
 <body>
 <table cellpadding="0" cellspacing="0" border="0" id="fruits" class="sortable">
 <thead><tr>
-<th><h3>item</h3></th>
+<th><h3>ROW_ID</h3></th>
 <th><h3>sold</h3></th>
-<th><h3>stockleft</h3></th>
 <th><h3>somevalue</h3></th>
+<th><h3>stockleft</h3></th>
 </tr></thead>
 <tr>
 <td>Apple</td>
-<td>200</td>
-<td>10</td>
+<td>100</td>
 <td>50</td>
-</tr>
-<tr>
-<td>Orange</td>
-<td>1200</td>
-<td>120</td>
-<td>530</td>
+<td>20</td>
 </tr>
 <tr>
 <td>Coconut</td>
-<td>2040</td>
+<td>120</td>
+<td>25</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Orange</td>
 <td>130</td>
-<td>520</td>
+<td>NULL</td>
+<td>7</td>
 </tr>
 </table>
+<div id="containerfruits" style="max-width: 1024px; height: 400px; margin: 0 auto"></div>
 <script type="text/javascript" src="tinytable/script.js"></script>
 <script type="text/javascript">
 var fruitssorter = new TINY.table.sorter("fruitssorter");
