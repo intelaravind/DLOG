@@ -10,7 +10,7 @@
  */
 
 /*
- * See DLOG_TABLE_MAP_SIMPLE2_Multiple.cpp for a flexible table
+ * See DLOG_TABLE_MAP_SIMPLE_Multiple.cpp for a flexible table
  */
 
 #include "../DLOG_TABLE.hpp"

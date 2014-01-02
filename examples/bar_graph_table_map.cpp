@@ -6,7 +6,7 @@
  */
 
 /*
- * compile with g++ bar_graph.cpp -std=c++11
+ * compile with g++ bar_graph_table_map.cpp -std=c++11
  */
 
 #include "../DLOG_TABLE_MAP.hpp"

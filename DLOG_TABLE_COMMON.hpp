@@ -12,7 +12,7 @@
 
 #define NOHOLD 0
 #define HOLD 1
-
+typedef int TID;
 std::string filter_string(std::string inp)
 {
 	std::string output = "";

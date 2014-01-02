@@ -19,14 +19,15 @@ using std::set;
 typedef map<string, string> ROWTYPE;
 class DLOG_TABLE_MAP
 {
-	set<string> aggregate_columns;
+
 	map<string, ROWTYPE> table;
-	std::string table_name;
 	std::string dataPath;
 
 
 public:
 	int drawGraph;
+	set<string> aggregate_columns;
+	std::string table_name;
 	DLOG_TABLE_MAP(const char *OUT_FILE, const char *tbl_name,
 			std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
 	{
@@ -263,5 +264,73 @@ void DLOG_TABLE_MAP::insert_elem(string row, string column, string value)
 	current_row->second.insert(std::make_pair(column, value));
 
 }
+
+
+class DLOG_TABLES_MAP
+{
+	std::vector<DLOG_TABLE_MAP> tables;
+	std::string dataPath;
+
+public:
+	DLOG_TABLES_MAP(const char *OUT_FILE,
+			std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
+	{
+		dataPath = inpPath + std::string(OUT_FILE);
+	}
+
+	void show_graph(TID tid)
+	{
+		tables.at(tid).drawGraph = 1;
+	}
+
+	TID newtable(const char *tablename)
+	{
+
+		DLOG_TABLE_MAP *temptable = new DLOG_TABLE_MAP(dataPath.c_str(), tablename);
+		tables.push_back(*temptable);
+		return TID(tables.size() - 1);
+	}
+
+	void insert_elem(TID tid, string row, string column, string value)
+	{
+		tables.at(tid).insert_elem(row,column,value);
+	}
+
+	void html_dump()
+	{
+		std::fstream fwrite;
+		fwrite.open(dataPath.c_str(), std::fstream::out);
+
+		table_html_header(fwrite);
+		for (auto temptable : tables)
+		{
+			if (temptable.aggregate_columns.size() == 0)
+				continue;
+			else if (temptable.drawGraph == 1)
+			{
+				temptable.table_emit_graph_javascript(fwrite);
+			}
+		}
+		table_html_header_end(fwrite);
+		std::vector<std::string> names;
+		for (auto temptable : tables)
+		{
+			if (temptable.aggregate_columns.size() == 0)
+				continue;
+			else
+			{
+				names.push_back(temptable.table_name);
+				temptable.table_html_dump_unwrap(fwrite, HOLD);
+				if (temptable.drawGraph == 1)
+				{
+					temptable.table_emit_graph_div(fwrite);
+				}
+			}
+		}
+
+		table_html_footer(fwrite, names);
+	}
+
+};
 
 #endif /* DLOG_TABLE_MAP_HPP_ */

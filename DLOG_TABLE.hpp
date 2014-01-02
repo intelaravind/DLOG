@@ -263,7 +263,7 @@ void DLOG_TABLE::table_dump()
 	}
 	std::cout << "\n\n";
 }
-typedef int TID;
+
 class DLOG_TABLES
 {
 	std::vector<DLOG_TABLE> tables;
@@ -289,7 +289,6 @@ public:
 		tables.push_back(*temptable);
 		header_row_populated.push_back(0);
 		return TID(tables.size() - 1);
-		return 0;
 	}
 
 	void insert_head_row(TID tid, std::vector<std::string> &inp)

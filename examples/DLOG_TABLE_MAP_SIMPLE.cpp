@@ -5,6 +5,11 @@
  *      Author: aravind
  */
 
+/*
+ * compile with g++ DLOG_TABLE_MAP_SIMPLE.cpp -std=c++11
+ */
+
+
 #include "../DLOG_TABLE_MAP.hpp"
 
 using namespace std;
