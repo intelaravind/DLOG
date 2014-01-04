@@ -8,12 +8,9 @@
 #ifndef DLOG_HELPER_HPP_
 #define DLOG_HELPER_HPP_
 
-#include "debug_common_headers.hpp"
 #include "DLOG_ADDON.hpp"
-#include "DLOG_RECOVERY.hpp"
-
-std::string mendl = "<br>\n";
-std::string br = "<br>";
+#define mendl  "<br>\n"
+#define br  "<br>"
 
 #define RED(s) "<FONT COLOR='red'>" << s <<  "</font>"
 #define GREEN(s) "<FONT COLOR='green'>" << s << "</font>"

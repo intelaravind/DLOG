@@ -1,6 +1,11 @@
 #include "../DLOG.hpp"
 
 
+/*
+ * Compile:
+ * 	g++ DLOG_SIMPLE.cpp -o DLOG_SIMPLE.out ../lib/libDLOG.a
+ */
+
 //define DLOG_DISABLE in DLOG.hpp or pass -DDLOG_DISABLE to disable the dlog.
 //Try the same example with DLOG_DISABLE. This option can be used for performance run, or
 //simply to disable dlog
