@@ -51,8 +51,6 @@
 #define DLOG_PRINT(obj,...)  obj.print()
 #endif
 
-static int gid = 0;
-
 /**
  * DLOG main class
  */
