@@ -7,6 +7,17 @@
 
 #include "DLOG_HELPER.hpp"
 
+#include <string>
+
+#include <iostream>
+#include <fstream>
+
+#include <cstdlib>
+#include <cstring>
+#include <cerrno>
+
+using namespace std;
+
 int main(int argc, char **argv)
 {
 	int status;

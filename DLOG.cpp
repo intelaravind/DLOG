@@ -26,6 +26,8 @@ DLOG::DLOG()
 //
 //}
 
+static int gid = 0;
+
 /**
  * The main DLOG constructor
  * @param userfile : The file which called the constructor
