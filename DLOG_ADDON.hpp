@@ -8,6 +8,8 @@
 #ifndef DLOG_ADDON_HPP_
 #define DLOG_ADDON_HPP_
 
+#include <string>
+
 
 class ADDON {
 	std::string s;

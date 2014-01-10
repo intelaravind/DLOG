@@ -7,6 +7,10 @@
 
 #include "DLOG_HELPER.hpp"
 
+#include <fstream>
+#include <string.h>
+#include <iostream>
+
 int main(int argc, char **argv)
 {
 	int status;
