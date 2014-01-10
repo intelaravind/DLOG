@@ -39,9 +39,4 @@ public:
 	}
 };
 
-
-
-
-
-
 #endif /* DLOG_ADDON_HPP_ */
