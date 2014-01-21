@@ -60,6 +60,7 @@ class DLOG
 	std::string dataPath;
 	std::string tagPath;
 	std::string datatempPath;
+
 	//set of known tags
 	std::set<std::string> tagset;
 
@@ -73,6 +74,9 @@ class DLOG
 	int id;
 
 public:
+
+	///this string can be used by users as a temporay object. DLOG internal never uses this
+	std::string dataString;
 
 	/**
 	 * Empty constructor to do nothing;
