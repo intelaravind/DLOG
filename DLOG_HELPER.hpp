@@ -7,6 +7,8 @@
 
 #ifndef DLOG_HELPER_HPP_
 #define DLOG_HELPER_HPP_
+#include <iostream>
+#include <string>
 
 #include "DLOG_ADDON.hpp"
 #define mendl  "<br>\n"
@@ -26,5 +28,10 @@
 #define ESPAN "</span>\n"
 #define NBSP "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 #define CALLINFO "<span class='CALLINFO' id='CALLINFO' style=\"font-size:12px\">"<<NBSP<<RED(userfile)<<":"<<RED(lineno)<<"</span>\n"
+
+bool replace(std::string&, const std::string&, const std::string&);
+void replaceAll(std::string&, const std::string&, const std::string&);
+
+std::string dlog_format_string_to_html(std::string );
 
 #endif /* DLOG_HELPER_HPP_ */

@@ -11,8 +11,7 @@
 #include "includellvm.h"
 #include "DLOG_HELPER.hpp"
 
-bool replace(std::string&, const std::string&, const std::string&);
-void replaceAll(std::string&, const std::string&, const std::string&);
+
 std::string dlog_format_llvm(std::string);
 
 template<typename T>

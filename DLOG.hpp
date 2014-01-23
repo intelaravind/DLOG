@@ -75,7 +75,7 @@ class DLOG
 
 public:
 
-	///this string can be used by users as a temporay object. DLOG internal never uses this
+	///this string can be used by users as a temporary object. DLOG internal never uses this
 	std::string dataString;
 
 	/**
@@ -83,50 +83,54 @@ public:
 	 * Used mainly to disable DLOG
 	 */
 	DLOG();
-	DLOG(const char *, int, const char *, std::string path = getenv("DLOG_OUTPUT_FOLDER"));
+	DLOG(const char *, int, const char *,
+			std::string path = getenv("DLOG_OUTPUT_FOLDER"));
 	~DLOG();
 
 	void tag_handler(std::string);
 
 	template<typename T>
-	void print(const char *userfile, int lineno, T obj, ADDON addon = ADDON())
+	void print(const char *userfile, int lineno, T obj_in, ADDON addon = ADDON())
 	{
+
+		std::string obj = dlog_format_string_to_html(obj_in);
 
 		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE)
 		{
 			tag_handler("notag");
 			fdata << DIV("notag") << br << CALLINFO << NBSP
-			<< BROWN(addon.getString()) << NBSP << BOLD(" Data : <br>")
-			<< obj << EDIV;
+					<< BROWN(addon.getString()) << NBSP << BOLD(" Data : <br>")
+					<< obj << EDIV;
 		}
 
 		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_STDOUT)
 		{
 			if (addon.getString().length() != 0)
 				std::cout << "Addon: " << addon.getString() << "\n";
-			std::cout << obj << "\n";
+			std::cout << obj_in << "\n";
 		}
 
 		fdata.flush();
 	}
 	template<typename T>
-	void print(const char *userfile, int lineno, T obj, const char* tag,
+	void print(const char *userfile, int lineno, T obj_in, const char* tag,
 			ADDON addon = ADDON())
 	{
+		std::string obj = dlog_format_string_to_html(obj_in);
 		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE)
 
 		{
 			tag_handler(tag);
 			fdata << DIV(tag) << BOLD("<br>Tag : ") << RED(tag) << NBSP << br
-			<< CALLINFO << BROWN(addon.getString()) << NBSP << NBSP
-			<< BOLD(" Data : <br>") << obj << EDIV;
+					<< CALLINFO << BROWN(addon.getString()) << NBSP << NBSP
+					<< BOLD(" Data : <br>") << obj << EDIV;
 		}
 		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_STDOUT)
 		{
 			std::cout << "Tag : " << tag << "\t";
 			if (addon.getString().length() != 0)
 				std::cout << "\t Addon: " << addon.getString() << "\n";
-			std::cout << obj << "\n";
+			std::cout << obj_in << "\n";
 		}
 
 		fdata.flush();
@@ -138,7 +142,7 @@ public:
 			ADDON())
 	{
 		std::string unformatted = llvm_to_str(*obj);
-		std::string formatted = dlog_format_llvm(unformatted);
+		std::string formatted = dlog_format_string(unformatted);
 
 		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE)
 		{
@@ -163,7 +167,7 @@ public:
 	{
 
 		std::string unformatted = llvm_to_str(obj);
-		std::string formatted = dlog_format_llvm(unformatted);
+		std::string formatted = dlog_format_string(unformatted);
 
 		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE)
 
