@@ -9,7 +9,7 @@
 
 DLOG::DLOG()
 {
-
+	isEnabled = false;
 }
 
 //template<typename T>
@@ -39,6 +39,7 @@ DLOG::DLOG(const char * userfile, int lineno, const char *OUT_FILE,
 		std::string inpPath)
 {
 	DLOG::dataPath = inpPath + std::string(OUT_FILE);
+	isEnabled = true;
 
 //	std::cout << dataPath << "\n";
 
@@ -75,6 +76,9 @@ DLOG::DLOG(const char * userfile, int lineno, const char *OUT_FILE,
 
 DLOG::~DLOG()
 {
+
+	if(isEnabled==false)
+		return;
 	std::string syscommand;
 	int status;
 

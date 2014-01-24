@@ -47,8 +47,8 @@
 #define DLOG_CREATE(path) (__FILE__,__LINE__,path)
 #define DLOG_PRINT(obj,...)  obj.print(__FILE__,__LINE__ ,__VA_ARGS__)
 #else
-#define DLOG_CREATE(path) ;
-#define DLOG_PRINT(obj,...)  obj.print()
+#define DLOG_CREATE(path);
+#define DLOG_PRINT(obj,...) ;
 #endif
 
 /**
@@ -60,6 +60,7 @@ class DLOG
 	std::string dataPath;
 	std::string tagPath;
 	std::string datatempPath;
+	bool isEnabled;
 
 	//set of known tags
 	std::set<std::string> tagset;
@@ -142,7 +143,7 @@ public:
 			ADDON())
 	{
 		std::string unformatted = llvm_to_str(*obj);
-		std::string formatted = dlog_format_string(unformatted);
+		std::string formatted = dlog_format_string_to_html(unformatted);
 
 		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE)
 		{
@@ -167,7 +168,7 @@ public:
 	{
 
 		std::string unformatted = llvm_to_str(obj);
-		std::string formatted = dlog_format_string(unformatted);
+		std::string formatted = dlog_format_string_to_html(unformatted);
 
 		if (outputmode == DLOG_OUTPUT_BOTH || outputmode == DLOG_OUTPUT_FILE)
 
