@@ -125,12 +125,6 @@ void DLOG_TABLE::table_emit_graph_javascript(std::fstream &fwrite)
 					"}\n"
 					"},\n"
 					"tooltip: {\n"
-					"   headerFormat: '<span style=\"font-size:10px\">{point.key}</span><table>',\n"
-					"  pointFormat: '<tr><td style=\"color:{series.color};padding:0\">{series.name}: </td>' +\n"
-					"     '<td style=\"padding:0\"><b>{point.y:.1f} </b></td></tr>',\n"
-					"footerFormat: '</table>',\n"
-					"shared: true,\n"
-					"useHTML: true\n"
 					"},\n"
 					"plotOptions:\n"
 					"{\n"
@@ -178,7 +172,7 @@ void DLOG_TABLE::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 
 	unsigned int n_cols = (values.at(0)).size();
 	unsigned int n_rows = values.size();
-	int i, j;
+	unsigned int i, j;
 
 	if (hold == 0)
 	{
@@ -248,9 +242,9 @@ void DLOG_TABLE::table_html_dump()
 void DLOG_TABLE::table_dump()
 {
 	std::cout << "Table: " << table_name << "\n";
-	unsigned int n_cols = (values.at(0)).size();
+//	unsigned int n_cols = (values.at(0)).size();
 	unsigned int n_rows = values.size();
-	int i, j;
+	unsigned int i, j;
 
 	for (i = 0; i < n_rows; i++)
 	{
