@@ -11,7 +11,6 @@
 #include "llvm/Pass.h"
 #include "llvm/Analysis/LoopPass.h"
 #include "llvm/Analysis/LoopInfo.h"
-#include "llvm/Analysis/Dominators.h"
 #include "llvm/Analysis/ScalarEvolution.h"
 
 #include "llvm/Transforms/Scalar.h"
@@ -30,9 +29,9 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringExtras.h"
 
-#include "llvm/Assembly/Writer.h"
-#include "llvm/Assembly/PrintModulePass.h"
-#include "llvm/Assembly/AssemblyAnnotationWriter.h"
+//#include "llvm/Assembly/Writer.h"
+//#include "llvm/Assembly/PrintModulePass.h"
+//#include "llvm/Assembly/AssemblyAnnotationWriter.h"
 
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Function.h"
