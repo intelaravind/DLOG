@@ -36,7 +36,7 @@ public:
 	DLOG_TABLE(const char *OUT_FILE, const char *tbl_name, std::string inpPath =
 			getenv("DLOG_OUTPUT_FOLDER"))
 	{
-		dataPath = inpPath + std::string(OUT_FILE);
+		dataPath = inpPath;
 		table_name = tbl_name;
 	}
 
@@ -219,8 +219,8 @@ void DLOG_TABLE::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 		std::vector<std::string> tempvec;
 		tempvec.push_back(table_name);
 		table_html_footer(fwrite, tempvec);
-		fwrite.close();
 
+		fwrite.close();
 	}
 
 	std::string syscommand;
@@ -235,6 +235,7 @@ void DLOG_TABLE::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 void DLOG_TABLE::table_html_dump()
 {
 	std::fstream fwrite;
+	std::cout<<"************dataPath = "<<dataPath<<"\n";
 	fwrite.open(dataPath.c_str(), std::fstream::out);
 	table_html_dump_unwrap(fwrite, NOHOLD);
 }
@@ -268,7 +269,9 @@ public:
 	DLOG_TABLES(const char *OUT_FILE,
 			std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
 	{
+
 		dataPath = inpPath + std::string(OUT_FILE);
+		std::cout<<"created tabales : " << dataPath<<"\n";
 	}
 
 	void show_graph(TID tid)
@@ -314,8 +317,10 @@ public:
 				temptable.table_emit_graph_javascript(fwrite);
 			}
 		}
+
 		table_html_header_end(fwrite);
 		std::vector<std::string> names;
+
 		for (auto temptable : tables)
 		{
 			if (temptable.values.size() == 0)
@@ -332,6 +337,8 @@ public:
 		}
 
 		table_html_footer(fwrite, names);
+
+
 	}
 
 };
