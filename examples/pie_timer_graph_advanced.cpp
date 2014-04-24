@@ -14,7 +14,7 @@ int main()
 
 	int graph_id2 = testgraph.newgraph("graph2", "just testing graph1 pie");
 
-	TID t1, t2, t3, t4, t5;
+	TID_PAIR t1, t2, t3, t4, t5;
 
 	t4 = testgraph.start_new(graph_id2, "super Full");
 	t1 = testgraph.start_new(graph_id, "Full");

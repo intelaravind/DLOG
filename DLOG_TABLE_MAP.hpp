@@ -278,20 +278,20 @@ public:
 		dataPath = inpPath + std::string(OUT_FILE);
 	}
 
-	void show_graph(TID tid)
+	void show_graph(TID_PAIR tid)
 	{
 		tables.at(tid).drawGraph = 1;
 	}
 
-	TID newtable(const char *tablename)
+	TID_PAIR newtable(const char *tablename)
 	{
 
 		DLOG_TABLE_MAP *temptable = new DLOG_TABLE_MAP(dataPath.c_str(), tablename);
 		tables.push_back(*temptable);
-		return TID(tables.size() - 1);
+		return TID_PAIR(tables.size() - 1);
 	}
 
-	void insert_elem(TID tid, string row, string column, string value)
+	void insert_elem(TID_PAIR tid, string row, string column, string value)
 	{
 		tables.at(tid).insert_elem(row,column,value);
 	}

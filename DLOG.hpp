@@ -14,7 +14,7 @@
 #include "DLOG_HELPER.hpp"
 
 #ifndef DLOG_DISABLE
-///uncomment this line to disable DLOG or use -DDLOG_DISABLE
+///comment this line to disable DLOG or use -DDLOG_DISABLE
 #define DLOG_ENABLE
 #endif
 

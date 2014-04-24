@@ -13,7 +13,7 @@
 #define NOHOLD 0
 #define HOLD 1
 typedef int TID;
-std::string filter_string(std::string inp)
+static std::string filter_string(std::string inp)
 {
 	std::string output = "";
 	for (auto ch : inp)
@@ -25,7 +25,7 @@ std::string filter_string(std::string inp)
 	return output;
 }
 
-void table_html_header(std::fstream &fwrite)
+static void table_html_header(std::fstream &fwrite)
 {
 	fwrite
 			<< "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
@@ -39,13 +39,13 @@ void table_html_header(std::fstream &fwrite)
 					"<script type='text/javascript' src='js/modules/exporting.js'></script>\n";
 }
 
-void table_html_header_end(std::fstream &fwrite)
+static void table_html_header_end(std::fstream &fwrite)
 {
 	fwrite << "</head>\n"
 			"<body>\n";
 }
 
-void table_html_footer(std::fstream &fwrite,
+static void table_html_footer(std::fstream &fwrite,
 		std::vector<std::string> table_name)
 {
 	fwrite

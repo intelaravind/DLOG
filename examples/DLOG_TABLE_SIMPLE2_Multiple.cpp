@@ -29,7 +29,7 @@ int main()
 
 	//table 1
 	{
-		TID table_fruits = tables.newtable("fruits");
+		TID_PAIR table_fruits = tables.newtable("fruits");
 
 		/*The header row*/
 		vector<string> head_row;
@@ -67,7 +67,7 @@ int main()
 
 	//table 2
 	{
-		TID table_cars = tables.newtable("cars");
+		TID_PAIR table_cars = tables.newtable("cars");
 
 		/*The header row*/
 		vector<string> head_row;

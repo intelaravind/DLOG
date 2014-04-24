@@ -12,7 +12,7 @@ int main()
 
 	int graph_id = testgraph.newgraph("graph1", "just testing graph1 pie");
 
-	TID t1, t2, t3;
+	TID_PAIR t1, t2, t3;
 
 	t1 = testgraph.start_new(graph_id, "Full");
 	t2 = testgraph.start_new(graph_id, "first");

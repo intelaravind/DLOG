@@ -11,7 +11,7 @@
 #include "DLOG_PIE_GRAPH.hpp"
 #include "DLOG_TIMER.hpp"
 
-typedef std::pair<int,int> TID;
+typedef std::pair<int,int> TID_PAIR;
 
 class DLOG_TIMED_PIE_GRAPH
 {
@@ -33,13 +33,13 @@ public:
 		return pie_graph->dlog_add_graph(name, title);
 	}
 
-	TID start_new(int graph_id, const char* item)
+	TID_PAIR start_new(int graph_id, const char* item)
 	{
 		items.push_back(std::string(item));
 		int tempid= timer[graph_id].start_new();
-		return TID(graph_id,tempid);
+		return TID_PAIR(graph_id,tempid);
 	}
-	long int stop(TID id)
+	long int stop(TID_PAIR id)
 	{
 
 		int graph_id = id.first;
@@ -49,7 +49,7 @@ public:
 		pie_graph->dlog_insert_val(graph_id, time, items[timer_id].c_str());
 		return time;
 	}
-	long int reset(TID id)
+	long int reset(TID_PAIR id)
 	{
 		int graph_id = id.first;
 		int timer_id = id.second;

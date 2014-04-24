@@ -21,7 +21,7 @@ int main()
 
 	//table 1
 	{
-		TID table_fruits = tables.newtable("fruits");
+		TID_PAIR table_fruits = tables.newtable("fruits");
 		tables.insert_elem(table_fruits, "Apple", "sold", "100");
 		tables.insert_elem(table_fruits, "Apple", "stockleft", "20");
 		tables.insert_elem(table_fruits, "Apple", "somevalue", "50");
@@ -37,7 +37,7 @@ int main()
 
 	//table 2
 	{
-		TID table_cars = tables.newtable("cars");
+		TID_PAIR table_cars = tables.newtable("cars");
 
 		/*Row 1*/
 		tables.insert_elem(table_cars, "Ferrari", "sold", "200");
