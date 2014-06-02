@@ -161,8 +161,8 @@ public:
 			row.push_back(str_times);
 			if (options.human_readable)
 			{
-			row.push_back(
-					"  (" + humanreadabletime(cummulative_time[i]) + " )");
+				row.push_back(
+						"  (" + humanreadabletime(cummulative_time[i]) + " )");
 			}
 
 			table.insert_row(row);
@@ -172,13 +172,23 @@ public:
 	}
 
 	void output_stream(FILE *fp, std::string tablename = "unnamed",
-			 DLOG_TIMER_OPTIONS options =
-					DLOG_TIMER_OPTIONS())
+			DLOG_TIMER_OPTIONS options = DLOG_TIMER_OPTIONS())
 	{
 
-		fprintf(fp,"%s\n",tablename.c_str());
-		fprintf(fp, "Name%sTime%sHuman_readable\n", options.delimiter.c_str(),options.delimiter.c_str());
-		fprintf(fp,"=============================================================================\n");
+		fprintf(fp, "%s\n", tablename.c_str());
+
+		if (options.human_readable == true)
+		{
+			fprintf(fp, "Name%sTime%sHuman_readable\n",
+					options.delimiter.c_str(), options.delimiter.c_str());
+		}
+		else
+		{
+			fprintf(fp, "Name%sTime\n", options.delimiter.c_str());
+		}
+
+		fprintf(fp,
+				"=============================================================================\n");
 
 		for (unsigned int i = 0; i < cummulative_time.size(); i++)
 		{
@@ -189,17 +199,17 @@ public:
 			if (options.human_readable == true)
 			{
 				std::string hr = "  (" + humanreadabletime(cummulative_time[i])
-								+ " )";
-				fprintf(fp, "%s%s%s%s%s\n", (timer_names[i]).c_str(), options.delimiter.c_str(),str_times.c_str(), options.delimiter.c_str(),hr.c_str());
+						+ " )";
+				fprintf(fp, "%s%s%s%s%s\n", (timer_names[i]).c_str(),
+						options.delimiter.c_str(), str_times.c_str(),
+						options.delimiter.c_str(), hr.c_str());
 
 			}
 			else
 			{
-			fprintf(fp, "%s%s%s\n", (timer_names[i]).c_str(), options.delimiter.c_str(),
-								str_times.c_str());
+				fprintf(fp, "%s%s%s\n", (timer_names[i]).c_str(),
+						options.delimiter.c_str(), str_times.c_str());
 			}
-
-
 
 		}
 	}
