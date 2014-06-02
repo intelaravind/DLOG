@@ -54,7 +54,5 @@ int main()
 	timer.output_stream(stdout,"formatted",opt);
 
 
-
-
 	return 0;
 }

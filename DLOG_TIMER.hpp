@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <sstream>
 #include <algorithm>
+#include <assert.h>
 
 template<class T>
 static std::string dlog_to_string(T input)
@@ -57,6 +58,9 @@ class DLOG_TIMER
 	int get_id_by_name(std::string name)
 	{
 		auto it = std::find(timer_names.begin(), timer_names.end(), name);
+
+		assert(it != timer_names.end() && "Accessing uninitialized timer");
+
 		int id = it - timer_names.begin();
 		return id;
 	}
