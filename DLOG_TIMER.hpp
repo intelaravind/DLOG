@@ -70,6 +70,7 @@ public:
 	{
 
 	}
+
 	void start(std::string name)
 	{
 		struct timespec start;
@@ -129,6 +130,15 @@ public:
 			exit(EXIT_FAILURE);
 		}
 		start_list[id] = start;
+	}
+
+	void start_or_resume(std::string name)
+	{
+		auto it = std::find(timer_names.begin(), timer_names.end(), name);
+		if (it == timer_names.end())
+			start(name);
+		else
+			resume(name);
 	}
 
 	void output_html_table(std::string filename, std::string tablename =
