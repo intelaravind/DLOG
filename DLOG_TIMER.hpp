@@ -120,6 +120,14 @@ public:
 		start_list[id] = start;
 	}
 
+	void reset_all_timers()
+	{
+		for(std::string timer_name : timer_names) 
+		{
+			this->reset(timer_name);
+		}
+	}
+
 	void reset(std::string name)
 	{
 		int id = get_id_by_name(name);
