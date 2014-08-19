@@ -231,6 +231,27 @@ public:
 
 		}
 	}
+
+	void output_json(FILE *fp, std::string tablename = "unnamed",
+			DLOG_TIMER_OPTIONS options = DLOG_TIMER_OPTIONS())
+	{
+
+		fprintf(fp, "measurement start token\n");
+		fprintf(fp, "{ \"%s\" :\n\t{\n", tablename.c_str());
+
+		for (unsigned int i = 0; i < cummulative_time.size(); i++)
+		{
+			std::string str_i = dlog_to_string(i);
+			std::string str_times = dlog_to_string(cummulative_time[i]);
+
+			fprintf(fp, "\t\"%s\" : %s", timer_names[i].c_str(), str_times.c_str());
+
+			if(i != cummulative_time.size()-1) fprintf(fp, ",\n"); 
+			else fprintf(fp, "\n");
+		}
+		fprintf(fp, "\t}\n}\n");
+		fprintf(fp, "measurement end token\n");
+	}
 };
 
 #endif /* DLOG_TIMER_HPP_ */
