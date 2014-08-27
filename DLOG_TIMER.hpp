@@ -9,6 +9,7 @@
 #define DLOG_TIMER_HPP_
 #include "debug_common_headers.hpp"
 #include "DLOG_TABLE.hpp"
+#include <pthread.h>
 #include <time.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -42,6 +43,22 @@ static std::string humanreadabletime(long input)
 
 }
 
+static long time_to_long(const struct timespec& t) {
+	return 1000000000 * t.tv_sec + t.tv_nsec;
+}
+
+struct event_interval {
+	event_interval(int _id, const struct timespec& _b, const struct timespec& _e) {
+		id = _id;
+		begin = _b;
+		end = _e;
+	}
+
+	int id;
+	struct timespec begin;
+	struct timespec end;
+};
+
 class DLOG_TIMER_OPTIONS
 {
 public:
@@ -54,6 +71,10 @@ class DLOG_TIMER
 	std::vector<struct timespec> start_list;
 	std::vector<long> cummulative_time;
 	std::vector<std::string> timer_names;
+
+
+	std::vector<event_interval> events;
+	pthread_spinlock_t events_lock; //to protect the events
 
 	int get_id_by_name(std::string name)
 	{
@@ -68,7 +89,12 @@ class DLOG_TIMER
 public:
 	DLOG_TIMER()
 	{
+		pthread_spin_init(&events_lock, 0);
+	}
 
+	~DLOG_TIMER()
+	{
+		pthread_spin_destroy(&events_lock);
 	}
 
 	void start(std::string name)
@@ -95,10 +121,15 @@ public:
 
 		int id = get_id_by_name(name);
 
-		auto val = 1000000000 * (stop.tv_sec - start_list[id].tv_sec)
-				+ (stop.tv_nsec - start_list[id].tv_nsec);
+		auto val = time_to_long(stop) - time_to_long(start_list[id]);
 
 		cummulative_time[id] += val;
+
+
+		pthread_spin_lock(&events_lock);
+		events.push_back(event_interval(id, start_list[id], stop));
+		pthread_spin_unlock(&events_lock);
+
 		return cummulative_time[id];
 	}
 
@@ -122,22 +153,16 @@ public:
 
 	void reset_all_timers()
 	{
-		for(std::string timer_name : timer_names) 
-		{
-			this->reset(timer_name);
+		for(unsigned i = 0; i < cummulative_time.size(); ++i) {
+			cummulative_time[i] = 0;
 		}
+		events.clear();
 	}
 
 	void reset(std::string name)
 	{
 		int id = get_id_by_name(name);
-		struct timespec start;
-		if (clock_gettime(CLOCK_REALTIME, &start) == -1)
-		{
-			perror("clock gettime");
-			exit(EXIT_FAILURE);
-		}
-		start_list[id] = start;
+		cummulative_time[id] = 0;
 	}
 
 	void start_or_resume(std::string name)
@@ -237,7 +262,7 @@ public:
 	{
 
 		fprintf(fp, "measurement start token\n");
-		fprintf(fp, "{ \"%s\" :\n\t{\n", tablename.c_str());
+		fprintf(fp, "{ \"%s\" : {\n", tablename.c_str());
 
 		for (unsigned int i = 0; i < cummulative_time.size(); i++)
 		{
@@ -249,7 +274,23 @@ public:
 			if(i != cummulative_time.size()-1) fprintf(fp, ",\n"); 
 			else fprintf(fp, "\n");
 		}
-		fprintf(fp, "\t}\n}\n");
+
+		fprintf(fp, "\t},\n  \"events\" : [\n");
+
+		long min_start = time_to_long(events[0].begin);
+		for (unsigned int i = 1; i < events.size(); ++i) {
+			min_start = std::min<long>(min_start, time_to_long(events[i].begin));
+		}
+		
+		for (unsigned int i = 0; i < events.size(); ++i) 
+		{
+			fprintf(fp, "\t{event : \"%s\", start : %ld, end : %ld}", timer_names[events[i].id].c_str(), time_to_long(events[i].begin)-min_start, time_to_long(events[i].end)-min_start);
+
+			if(i!=events.size()) fprintf(fp, ",\n");
+			else fprintf(fp, "\n");
+		}
+
+		fprintf(fp, "\t]\n}\n");
 		fprintf(fp, "measurement end token\n");
 	}
 };
