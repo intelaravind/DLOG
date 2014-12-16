@@ -10,289 +10,230 @@
 #include "debug_common_headers.hpp"
 #include "DLOG_TABLE.hpp"
 #include <pthread.h>
-#include <time.h>
-#include <unistd.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdlib>
 #include <sstream>
 #include <algorithm>
+
+#include <mutex>
+
 #include <assert.h>
+#include <unistd.h>
+
+class DLOG_TIMER;
+struct finished_event;
+struct unfinished_event;
 
 template<class T>
 static std::string dlog_to_string(T input)
 {
-	std::ostringstream convert;
-	convert << input;
-	return convert.str();
+    std::ostringstream convert;
+    convert << input;
+    return convert.str();
+}
+
+static long time_to_long(const struct timespec& t) {
+    return t.tv_sec * 1000000000 + t.tv_nsec;
 }
 
 static std::string humanreadabletime(long input)
 {
 
-	input = input / 1000000; // max accuray we need is milli second
+    input = input / 1000000; // max accuray we need is milli second
 
-	std::string hour = dlog_to_string(input / ((long) 1000 * 60 * 60));
+    std::string hour = dlog_to_string(input / ((long) 1000 * 60 * 60));
 
-	input = input % (1000 * 60 * 60);
-	std::string min = dlog_to_string(input / ((long) 1000 * 60));
+    input = input % (1000 * 60 * 60);
+    std::string min = dlog_to_string(input / ((long) 1000 * 60));
 
-	input = input % (1000 * 60);
-	std::string sec = dlog_to_string(input / ((double) 1000));
+    input = input % (1000 * 60);
+    std::string sec = dlog_to_string(input / ((double) 1000));
 
-	std::string ret = hour + "h : " + min + "m : " + sec + " s";
-	return ret;
+    std::string ret = hour + "h : " + min + "m : " + sec + " s";
+    return ret;
 
 }
 
-static long time_to_long(const struct timespec& t) {
-	return 1000000000 * t.tv_sec + t.tv_nsec;
-}
+struct event_t {
+    event_t(const char* n, struct timespec b, struct timespec e) {
+        name = n;
+        begin = b;
+        end = e;
+    }
 
-struct event_interval {
-	event_interval(int _id, const struct timespec& _b, const struct timespec& _e) {
-		id = _id;
-		begin = _b;
-		end = _e;
-	}
-
-	int id;
-	struct timespec begin;
-	struct timespec end;
+    struct timespec begin, end;
+    const char* name;
 };
 
 class DLOG_TIMER_OPTIONS
 {
 public:
-	std::string delimiter = "\t";
-	bool human_readable = true;
+    std::string delimiter = "\t";
+    bool human_readable = true;
 };
 
 class DLOG_TIMER
 {
-	std::vector<struct timespec> start_list;
-	std::vector<long> cummulative_time;
-	std::vector<std::string> timer_names;
+    std::map<std::string, struct timespec> started;
+    std::vector<event_t> events;
 
-
-	std::vector<event_interval> events;
-	pthread_spinlock_t events_lock; //to protect the events
-
-	int get_id_by_name(std::string name)
-	{
-		auto it = std::find(timer_names.begin(), timer_names.end(), name);
-
-		assert(it != timer_names.end() && "Accessing uninitialized timer");
-
-		int id = it - timer_names.begin();
-		return id;
-	}
+    std::mutex mut;
 
 public:
-	DLOG_TIMER()
-	{
-		pthread_spin_init(&events_lock, 0);
-	}
+    DLOG_TIMER(){}
 
-	~DLOG_TIMER()
-	{
-		pthread_spin_destroy(&events_lock);
-	}
+    ~DLOG_TIMER(){}
 
-	void start(std::string name)
-	{
-		struct timespec start;
-		if (clock_gettime(CLOCK_REALTIME, &start) == -1)
-		{
-			perror("clock gettime");
-			exit(EXIT_FAILURE);
-		}
-		start_list.push_back(start);
-		cummulative_time.push_back(0);
-		timer_names.push_back(name);
-	}
+    void start(const char *name)
+    {
+        struct timespec start;
+        if (clock_gettime(CLOCK_REALTIME, &start) == -1)
+        {
+            perror("clock gettime");
+            exit(EXIT_FAILURE);
+        }
 
-	long int stop(std::string name)
-	{
-		struct timespec stop;
-		if (clock_gettime(CLOCK_REALTIME, &stop) == -1)
-		{
-			perror("clock gettime");
-			exit(EXIT_FAILURE);
-		}
+        mut.lock();
 
-		int id = get_id_by_name(name);
+        started[name] = start;
 
-		auto val = time_to_long(stop) - time_to_long(start_list[id]);
+        mut.unlock();
+    }
 
-		cummulative_time[id] += val;
+    void stop(const char* name)
+    {
+        struct timespec stop;
+        if (clock_gettime(CLOCK_REALTIME, &stop) == -1)
+        {
+            perror("clock gettime");
+            exit(EXIT_FAILURE);
+        }
 
+        mut.lock();
 
-		pthread_spin_lock(&events_lock);
-		events.push_back(event_interval(id, start_list[id], stop));
-		pthread_spin_unlock(&events_lock);
+        std::map<std::string, struct timespec>::iterator begin = started.find(name);
+        event_t event(name, begin->second, stop);
+        events.push_back(event);
+        started.erase(begin);
 
-		return cummulative_time[id];
-	}
+        mut.unlock();
+    }
 
-	long int pause(std::string name)
-	{
-		return stop(name);
-	}
+    void reset() {
+        mut.lock();
 
-	void resume(std::string name)
-	{
-		int id = get_id_by_name(name);
-//		std::cout<<"Id = "<<id<<" times "<< times[id] <<"\n";
-		struct timespec start;
-		if (clock_gettime(CLOCK_REALTIME, &start) == -1)
-		{
-			perror("clock gettime");
-			exit(EXIT_FAILURE);
-		}
-		start_list[id] = start;
-	}
+        started.clear();
+        events.clear();
 
-	void reset_all_timers()
-	{
-		for(unsigned i = 0; i < cummulative_time.size(); ++i) {
-			cummulative_time[i] = 0;
-		}
-		events.clear();
-	}
+        mut.unlock();
+    }
 
-	void reset(std::string name)
-	{
-		int id = get_id_by_name(name);
-		cummulative_time[id] = 0;
-	}
+    std::map<std::string, long> get_cummulative_times() {
+        std::map<std::string, long> cummul;
 
-	void start_or_resume(std::string name)
-	{
-		auto it = std::find(timer_names.begin(), timer_names.end(), name);
-		if (it == timer_names.end())
-			start(name);
-		else
-			resume(name);
-	}
+        for(event_t &event : events)
+            cummul[event.name] = 0;
 
-	void output_html_table(std::string filename, std::string tablename =
-			"unnamed", std::string path = "", DLOG_TIMER_OPTIONS options =
-			DLOG_TIMER_OPTIONS())
-	{
+        for(event_t &event : events)
+            cummul[event.name] += time_to_long(event.end) - time_to_long(event.begin);
 
-		if (path == "")
-			path = getenv("DLOG_OUTPUT_FOLDER");
+        return cummul;
+    }
 
-		DLOG_TABLE table(filename.c_str(), tablename.c_str(), path);
-		std::vector<std::string> head_row;
+    void output_html_table(std::string filename, std::string tablename =
+            "unnamed", std::string path = "", DLOG_TIMER_OPTIONS options =
+            DLOG_TIMER_OPTIONS())
+    {
 
-		head_row.push_back("Name");
-		head_row.push_back("Time");
+        if (path == "")
+            path = getenv("DLOG_OUTPUT_FOLDER");
 
-		if (options.human_readable)
-		{
-			head_row.push_back("Human readable");
-		}
-		table.insert_row(head_row);
+        DLOG_TABLE table(filename.c_str(), tablename.c_str(), path);
+        std::vector<std::string> head_row;
 
-		for (unsigned int i = 0; i < cummulative_time.size(); i++)
-		{
-			std::vector<std::string> row;
-			std::string str_i = dlog_to_string(i);
-			std::string str_times = dlog_to_string(cummulative_time[i]);
+        head_row.push_back("Name");
+        head_row.push_back("Time");
 
-			row.push_back(timer_names[i]);
-			row.push_back(str_times);
-			if (options.human_readable)
-			{
-				row.push_back(
-						"  (" + humanreadabletime(cummulative_time[i]) + " )");
-			}
+        if (options.human_readable)
+        {
+            head_row.push_back("Human readable");
+        }
+        table.insert_row(head_row);
 
-			table.insert_row(row);
+        std::map<std::string, long> cummulative_time = get_cummulative_times();
 
-		}
-		table.table_html_dump();
-	}
+        for (auto pair : cummulative_time)
+        {
+            std::vector<std::string> row;
+            row.push_back(pair.first);
+            row.push_back(dlog_to_string(pair.second));
 
-	void output_stream(FILE *fp, std::string tablename = "unnamed",
-			DLOG_TIMER_OPTIONS options = DLOG_TIMER_OPTIONS())
-	{
+            if (options.human_readable)
+            {
+                row.push_back(
+                        "  (" + humanreadabletime(pair.second) + " )");
+            }
 
-		fprintf(fp, "%s\n", tablename.c_str());
+            table.insert_row(row);
+        }
+        table.table_html_dump();
+    }
 
-		if (options.human_readable == true)
-		{
-			fprintf(fp, "Name%sTime%sHuman_readable\n",
-					options.delimiter.c_str(), options.delimiter.c_str());
-		}
-		else
-		{
-			fprintf(fp, "Name%sTime\n", options.delimiter.c_str());
-		}
+    void output_stream(FILE *fp, std::string tablename = "unnamed",
+            DLOG_TIMER_OPTIONS options = DLOG_TIMER_OPTIONS())
+    {
 
-		fprintf(fp,
-				"=============================================================================\n");
+        fprintf(fp, "%s\n", tablename.c_str());
 
-		for (unsigned int i = 0; i < cummulative_time.size(); i++)
-		{
-			std::vector<std::string> row;
-			std::string str_i = dlog_to_string(i);
-			std::string str_times = dlog_to_string(cummulative_time[i]);
+        if (options.human_readable == true)
+        {
+            fprintf(fp, "Name%sTime%sHuman_readable\n",
+                    options.delimiter.c_str(), options.delimiter.c_str());
+        }
+        else
+        {
+            fprintf(fp, "Name%sTime\n", options.delimiter.c_str());
+        }
 
-			if (options.human_readable == true)
-			{
-				std::string hr = "  (" + humanreadabletime(cummulative_time[i])
-						+ " )";
-				fprintf(fp, "%s%s%s%s%s\n", (timer_names[i]).c_str(),
-						options.delimiter.c_str(), str_times.c_str(),
-						options.delimiter.c_str(), hr.c_str());
+        fprintf(fp,
+                "=============================================================================\n");
 
-			}
-			else
-			{
-				fprintf(fp, "%s%s%s\n", (timer_names[i]).c_str(),
-						options.delimiter.c_str(), str_times.c_str());
-			}
+        std::map<std::string, long> cummulative_time = get_cummulative_times();
 
-		}
-	}
+        for (auto pair : cummulative_time)
+        {
+            std::string str_times = dlog_to_string(pair.second);
 
-	void output_json(FILE *fp, std::string tablename = "unnamed",
-			DLOG_TIMER_OPTIONS options = DLOG_TIMER_OPTIONS())
-	{
+            if (options.human_readable == true)
+            {
+                std::string hr = "  (" + humanreadabletime(pair.second)
+                        + " )";
+                fprintf(fp, "%s%s%s%s%s\n", pair.first.c_str(),
+                        options.delimiter.c_str(), str_times.c_str(),
+                        options.delimiter.c_str(), hr.c_str());
+            }
+            else
+            {
+                fprintf(fp, "%s%s%s\n", (pair.first).c_str(),
+                        options.delimiter.c_str(), str_times.c_str());
+            }
+        }
+    }
 
-		fprintf(fp, "measurement start token\n");
-		fprintf(fp, "{ \"%s\" : {\n", tablename.c_str());
+    void csv_events(FILE *fp) {
+        fprintf(fp, "event,begin,end\n");
 
-		for (unsigned int i = 0; i < cummulative_time.size(); i++)
-		{
-			std::string str_i = dlog_to_string(i);
-			std::string str_times = dlog_to_string(cummulative_time[i]);
+        std::map<std::string, int> occurrences;
 
-			fprintf(fp, "\t\"%s\" : %s", timer_names[i].c_str(), str_times.c_str());
+        for (event_t &event : events)
+            occurrences[event.name] = 0;
 
-			if(i != cummulative_time.size()-1) fprintf(fp, ",\n"); 
-			else fprintf(fp, "\n");
-		}
-
-		fprintf(fp, "\t},\n  \"events\" : [\n");
-
-		long min_start = time_to_long(events[0].begin);
-		for (unsigned int i = 1; i < events.size(); ++i) {
-			min_start = std::min<long>(min_start, time_to_long(events[i].begin));
-		}
-		
-		for (unsigned int i = 0; i < events.size(); ++i) 
-		{
-			fprintf(fp, "\t{event : \"%s\", start : %ld, end : %ld}", timer_names[events[i].id].c_str(), time_to_long(events[i].begin)-min_start, time_to_long(events[i].end)-min_start);
-
-			if(i!=events.size()) fprintf(fp, ",\n");
-			else fprintf(fp, "\n");
-		}
-
-		fprintf(fp, "\t]\n}\n");
-		fprintf(fp, "measurement end token\n");
-	}
+        for (event_t &event : events) {
+            fprintf(fp, "%s[%d],\"%ld\",\"%ld\"\n", event.name, occurrences[event.name], time_to_long(event.begin), time_to_long(event.end));
+            occurrences[event.name] += 1;
+        }
+        fprintf(fp, ",,\n");
+    }
 };
 
 #endif /* DLOG_TIMER_HPP_ */
