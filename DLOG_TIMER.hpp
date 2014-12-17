@@ -131,11 +131,15 @@ public:
     std::map<std::string, long> get_cummulative_times() {
         std::map<std::string, long> cummul;
 
+        mut.lock();
+
         for(event_t &event : events)
             cummul[event.name] = 0;
 
         for(event_t &event : events)
             cummul[event.name] += time_to_long(event.end) - time_to_long(event.begin);
+
+        mut.unlock();
 
         return cummul;
     }
@@ -223,6 +227,8 @@ public:
     void csv_events(FILE *fp) {
         fprintf(fp, "event,begin,end\n");
 
+        mut.lock();
+
         std::map<std::string, int> occurrences;
 
         for (event_t &event : events)
@@ -233,6 +239,8 @@ public:
             occurrences[event.name] += 1;
         }
         fprintf(fp, ",,\n");
+
+        mut.unlock();
     }
 };
 
