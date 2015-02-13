@@ -251,7 +251,7 @@ public:
     </script>
     </head>
       <body>
-        <div id="timeline" style="width: 900px; height: 180px;"></div>
+        <div id="timeline" style="width: 1024px; height: 1024px;"></div>
       </body>
     </html>)";
 
