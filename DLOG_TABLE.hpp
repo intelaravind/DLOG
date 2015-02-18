@@ -232,6 +232,7 @@ public:
         var dataTable = new google.visualization.DataTable();)";
 
         fwrite << "\n" << R"(
+        dataTable.addColumn({ type: 'string', id: 'Info' });
         dataTable.addColumn({ type: 'string', id: 'Event' });
         dataTable.addColumn({ type: 'number', id: 'Start' });
         dataTable.addColumn({ type: 'number', id: 'End' });)" << "\n";
@@ -242,11 +243,13 @@ public:
         for (unsigned int i = 0; i < n_rows; i++)
         {
             t_row *row = &values.at(i);
-            fwrite << "[ '" << row->at(0) << "', " << row->at(1) << ", " << row->at(2) << "],\n";
+            fwrite << "[ '" << row->at(0) << "', '" << row->at(1) << "', " << row->at(2) << ", " << row->at(3) << "],\n";
         }
         fwrite << "]);\n";
-
-        fwrite << R"(chart.draw(dataTable);
+        fwrite << R"(  var options = {
+		    timeline: { showRowLabels: false }
+	  };)" << "\n";
+        fwrite << R"(chart.draw(dataTable,options);
       }
     </script>
     </head>
@@ -290,7 +293,7 @@ public:
     {
 
         dataPath = inpPath + std::string(OUT_FILE);
-        std::cout << "created tabales : " << dataPath << "\n";
+        std::cout << "created tables : " << dataPath << "\n";
     }
 
     void show_graph(TID tid)

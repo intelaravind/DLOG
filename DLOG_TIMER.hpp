@@ -38,6 +38,11 @@ static long time_to_long(const struct timespec& t)
 }
 
 
+static std::string time_to_string(const struct timespec& t)
+{
+    return std::to_string(time_to_long(t));
+}
+
 static std::string humanreadabletime(long input)
 {
 
@@ -58,15 +63,17 @@ static std::string humanreadabletime(long input)
 
 struct event_t
 {
-	event_t(const char* n, struct timespec b, struct timespec e)
-	{
+    event_t(const char* n, struct timespec b, struct timespec e, std::string i)
+    {
         name = n;
         begin = b;
         end = e;
+	info = i;
     }
 
     struct timespec begin, end;
     const char* name;
+    std::string info;
 };
 
 class DLOG_TIMER_OPTIONS
@@ -84,13 +91,13 @@ class DLOG_TIMER
     std::mutex mut;
 
 public:
-	DLOG_TIMER()
-	{
-	}
+    DLOG_TIMER()
+    {
+    }
 
-	~DLOG_TIMER()
-	{
-	}
+    ~DLOG_TIMER()
+    {
+    }
 
     void start(const char *name)
     {
@@ -108,7 +115,7 @@ public:
         mut.unlock();
     }
 
-    void stop(const char* name)
+    void stop(const char* name, std::string info="")
     {
         struct timespec stop;
         if (clock_gettime(CLOCK_REALTIME, &stop) == -1)
@@ -120,15 +127,15 @@ public:
         mut.lock();
 
         std::map<std::string, struct timespec>::iterator begin = started.find(name);
-        event_t event(name, begin->second, stop);
+        event_t event(name, begin->second, stop,info);
         events.push_back(event);
         started.erase(begin);
 
         mut.unlock();
     }
 
-	void reset()
-	{
+    void reset()
+    {
         mut.lock();
 
         started.clear();
@@ -137,8 +144,8 @@ public:
         mut.unlock();
     }
 
-	std::map<std::string, long> get_cummulative_times()
-	{
+    std::map<std::string, long> get_cummulative_times()
+    {
         std::map<std::string, long> cummul;
         mut.lock();
 
@@ -152,7 +159,7 @@ public:
         return cummul;
     }
 
-	void output_html_table(std::string filename, std::string tablename = "unnamed", std::string path = "", DLOG_TIMER_OPTIONS options = DLOG_TIMER_OPTIONS())
+    void output_html_table(std::string filename, std::string tablename = "unnamed", std::string path = "", DLOG_TIMER_OPTIONS options = DLOG_TIMER_OPTIONS())
     {
 
         if (path == "")
@@ -180,7 +187,7 @@ public:
 
             if (options.human_readable)
             {
-				row.push_back("  (" + humanreadabletime(pair.second) + " )");
+                row.push_back("  (" + humanreadabletime(pair.second) + " )");
             }
 
             table.insert_row(row);
@@ -188,21 +195,21 @@ public:
         table.table_html_dump();
     }
 
-	void output_stream(FILE *fp, std::string tablename = "unnamed", DLOG_TIMER_OPTIONS options = DLOG_TIMER_OPTIONS())
+    void output_stream(FILE *fp, std::string tablename = "unnamed", DLOG_TIMER_OPTIONS options = DLOG_TIMER_OPTIONS())
     {
 
         fprintf(fp, "%s\n", tablename.c_str());
 
         if (options.human_readable == true)
         {
-			fprintf(fp, "Name%sTime%sHuman_readable\n", options.delimiter.c_str(), options.delimiter.c_str());
+            fprintf(fp, "Name%sTime%sHuman_readable\n", options.delimiter.c_str(), options.delimiter.c_str());
         }
         else
         {
             fprintf(fp, "Name%sTime\n", options.delimiter.c_str());
         }
 
-		fprintf(fp, "=============================================================================\n");
+        fprintf(fp, "=============================================================================\n");
 
         std::map<std::string, long> cummulative_time = get_cummulative_times();
 
@@ -212,18 +219,18 @@ public:
 
             if (options.human_readable == true)
             {
-				std::string hr = "  (" + humanreadabletime(pair.second) + " )";
-				fprintf(fp, "%s%s%s%s%s\n", pair.first.c_str(), options.delimiter.c_str(), str_times.c_str(), options.delimiter.c_str(), hr.c_str());
+                std::string hr = "  (" + humanreadabletime(pair.second) + " )";
+                fprintf(fp, "%s%s%s%s%s\n", pair.first.c_str(), options.delimiter.c_str(), str_times.c_str(), options.delimiter.c_str(), hr.c_str());
             }
             else
             {
-				fprintf(fp, "%s%s%s\n", (pair.first).c_str(), options.delimiter.c_str(), str_times.c_str());
+                fprintf(fp, "%s%s%s\n", (pair.first).c_str(), options.delimiter.c_str(), str_times.c_str());
             }
         }
     }
 
-	void csv_events(FILE *fp)
-	{
+    void csv_events(FILE *fp)
+    {
         fprintf(fp, "event,begin,end\n");
         mut.lock();
 
@@ -232,52 +239,55 @@ public:
         for (event_t &event : events)
             occurrences[event.name] = 0;
 
-		for (event_t &event : events)
-		{
-            fprintf(fp, "%s[%d],\"%ld\",\"%ld\"\n", event.name, occurrences[event.name], time_to_long(event.begin), time_to_long(event.end));
+        for (event_t &event : events)
+        {
+            fprintf(fp, "%s[%d],\"%ld\",\"%ld\" -> %s\n", event.name, occurrences[event.name], time_to_long(event.begin), time_to_long(event.end), event.info.c_str());
             occurrences[event.name] += 1;
         }
         fprintf(fp, ",,\n");
         mut.unlock();
     }
-	void events_html_gantt(std::string filename, std::string tablename = "unnamed", std::string path = "")
-	{
-		mut.lock();
-		if (path == "")
-			path = getenv("DLOG_OUTPUT_FOLDER");
+    void events_html_gantt(std::string filename, std::string tablename = "unnamed", std::string path = "")
+    {
+        mut.lock();
+        if (path == "")
+            path = getenv("DLOG_OUTPUT_FOLDER");
 
-		DLOG_TABLE table(filename.c_str(), tablename.c_str(), path);
-		std::vector < std::string > head_row;
+        DLOG_TABLE table(filename.c_str(), tablename.c_str(), path);
+        std::vector < std::string > head_row;
 
-		head_row.push_back("Event");
-		head_row.push_back("Begin");
-		head_row.push_back("End");
+	head_row.push_back("Info");
+        head_row.push_back("Event");
+        head_row.push_back("Begin");
+        head_row.push_back("End");
 
-		std::map<std::string, int> occurrences;
+        std::map<std::string, int> occurrences;
 
-		for (event_t &event : events)
-			occurrences[event.name] = 0;
+        for (event_t &event : events)
+            occurrences[event.name] = 0;
 
-		long min = std::numeric_limits<long>::max();
-		for (event_t &event : events)
-		{
-			long converted= time_to_long(event.begin);
-			min = (min< converted)?min:converted;
-		}
+        long min = std::numeric_limits<long>::max();
+        for (event_t &event : events)
+        {
+            long converted = time_to_long(event.begin);
+            min = (min < converted) ? min : converted;
+        }
 
 
-		for (event_t &event : events)
-		{
-			std::vector < std::string > row;
-			row.push_back(event.name);
-			row.push_back(std::to_string( time_to_long(event.begin) - min));
-			row.push_back(std::to_string(time_to_long( event.end) - min));
-			table.insert_row(row);
-			occurrences[event.name] += 1;
-		}
-		table.table_gantt_dump();
-		mut.unlock();
-	}
+        for (event_t &event : events)
+        {
+            std::vector < std::string > row;
+	    std::string info = "b: " + time_to_string(event.begin) + " e: " + time_to_string( event.end) + "  addon: " +event.info;
+	    row.push_back(info);
+            row.push_back(event.name);
+            row.push_back(std::to_string( time_to_long(event.begin) - min));
+            row.push_back(std::to_string(time_to_long( event.end) - min));
+            table.insert_row(row);
+            occurrences[event.name] += 1;
+        }
+        table.table_gantt_dump();
+        mut.unlock();
+    }
 };
 
 #endif /* DLOG_TIMER_HPP_ */
