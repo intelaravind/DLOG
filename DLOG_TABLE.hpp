@@ -243,11 +243,11 @@ public:
         for (unsigned int i = 0; i < n_rows; i++)
         {
             t_row *row = &values.at(i);
-            fwrite << "[ '" << row->at(0) << "', '" << row->at(1) << "', " << row->at(2) << ", " << row->at(3) << "],\n";
+            fwrite << "[ '" << row->at(1) << "', '" << row->at(0) << "', " << row->at(2) << ", " << row->at(3) << "],\n";
         }
         fwrite << "]);\n";
         fwrite << R"(  var options = {
-		    timeline: { showRowLabels: false }
+timeline: {colorByRowLabel: true, showBarLabels: false}
 	  };)" << "\n";
         fwrite << R"(chart.draw(dataTable,options);
       }
