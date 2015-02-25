@@ -63,7 +63,7 @@ static std::string humanreadabletime(long input)
 
 struct event_t
 {
-    event_t(const char* n, struct timespec b, struct timespec e, std::string i)
+    event_t(std::string n, struct timespec b, struct timespec e, std::string i)
     {
         name = n;
         begin = b;
@@ -72,7 +72,7 @@ struct event_t
     }
 
     struct timespec begin, end;
-    const char* name;
+    std::string name;
     std::string info;
 };
 
@@ -99,7 +99,7 @@ public:
     {
     }
 
-    void start(const char *name)
+    void start(std::string name)
     {
         struct timespec start;
         if (clock_gettime(CLOCK_REALTIME, &start) == -1)
@@ -115,7 +115,7 @@ public:
         mut.unlock();
     }
 
-    void stop(const char* name, std::string info="")
+    void stop(std::string name, std::string info="")
     {
         struct timespec stop;
         if (clock_gettime(CLOCK_REALTIME, &stop) == -1)
@@ -241,10 +241,10 @@ public:
 
         for (event_t &event : events)
         {
-            fprintf(fp, "%s[%d],\"%ld\",\"%ld\" -> %s\n", event.name, occurrences[event.name], time_to_long(event.begin), time_to_long(event.end), event.info.c_str());
+            fprintf(fp, "%s[%d],\"%ld\",\"%ld\",%s\n", event.name.c_str(), occurrences[event.name],
+		    time_to_long(event.begin), time_to_long(event.end), event.info.c_str());
             occurrences[event.name] += 1;
         }
-        fprintf(fp, ",,\n");
         mut.unlock();
     }
     void events_html_gantt(std::string filename, std::string tablename = "unnamed", std::string path = "")
@@ -277,7 +277,11 @@ public:
         for (event_t &event : events)
         {
             std::vector < std::string > row;
-	    std::string info = "b: " + time_to_string(event.begin) + " e: " + time_to_string( event.end) + "  addon: " +event.info;
+	    long duration = event.end.tv_sec * 1000000000 - event.begin.tv_sec * 1000000000 + event.end.tv_nsec - event.begin.tv_nsec;
+	    std::string info = "b: " + time_to_string(event.begin) + " e: " + time_to_string(event.end)
+		+ " d: " + std::to_string(duration)
+		+ " ( " + humanreadabletime(duration) + " )"
+		+ " addon: " + event.info;
 	    row.push_back(info);
             row.push_back(event.name);
             row.push_back(std::to_string( time_to_long(event.begin) - min));
