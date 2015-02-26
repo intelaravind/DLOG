@@ -11,7 +11,7 @@
 
 
 #include "../DLOG_TABLE_MAP.hpp"
-
+#include <iostream>
 using namespace std;
 
 int main()
@@ -36,7 +36,11 @@ int main()
 	table.insert_elem("Coconut", "somevalue", "0");
 
 //	table.table_dump(); // to dump on screen
-	table.table_html_dump();
+	std::ostream out(std::cout.rdbuf()); //dump csv screen
+	table.table_csv_dump(out);
+//	table.table_html_dump();
+
+
 
 	return 0;
 }

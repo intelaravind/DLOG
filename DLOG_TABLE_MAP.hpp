@@ -17,23 +17,22 @@ using std::string;
 using std::set;
 
 typedef map<string, string> ROWTYPE;
+
 class DLOG_TABLE_MAP
 {
 
 	map<string, ROWTYPE> table;
 	std::string dataPath;
 
-
 public:
 	int drawGraph;
 	set<string> aggregate_columns;
 	std::string table_name;
-	DLOG_TABLE_MAP(const char *OUT_FILE, const char *tbl_name,
-			std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
+	DLOG_TABLE_MAP(const char *OUT_FILE, const char *tbl_name, std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
 	{
 		dataPath = inpPath + std::string(OUT_FILE);
 		table_name = tbl_name;
-		drawGraph=0;
+		drawGraph = 0;
 	}
 	void table_emit_graph_javascript(std::fstream &fwrite);
 	void insert_elem(string, string, string);
@@ -41,14 +40,14 @@ public:
 	void table_html_dump_unwrap(std::fstream &, int);
 	void table_emit_graph_div(std::fstream &fwrite);
 	void table_dump();
+	void table_csv_dump(std::ostream &);
 	void table_html_dump();
 
 };
 
 void DLOG_TABLE_MAP::table_map_emit_graph_div(std::fstream &fwrite)
 {
-	fwrite << "<div id=\"container" << filter_string(table_name)
-			<< "\" style=\"max-width: 1024px; height: 400px; margin: 0 auto\"></div>\n";
+	fwrite << "<div id=\"container" << filter_string(table_name) << "\" style=\"max-width: 1024px; height: 400px; margin: 0 auto\"></div>\n";
 }
 
 void DLOG_TABLE_MAP::table_dump()
@@ -88,61 +87,60 @@ void DLOG_TABLE_MAP::table_emit_graph_javascript(std::fstream &fwrite)
 	fwrite << "<script type=\"text/javascript\">\n"
 			"(function($){\n"
 			"$(function () {\n"
-			"$('#" << "container" << filter_string(table_name)
-			<< "').highcharts({\n"
-					"chart: {\n"
-					"type: 'column',\n"
-					"zoomType: 'xy'\n"
-					"},\n"
-					"title: {"
-					"text: '" << table_name << "'\n"
-					" },\n"
-					"xAxis: {\n"
-					"categories: [\n";
+			"$('#" << "container" << filter_string(table_name) << "').highcharts({\n"
+			"chart: {\n"
+			"type: 'column',\n"
+			"zoomType: 'xy'\n"
+			"},\n"
+			"title: {"
+			"text: '" << table_name << "'\n"
+			" },\n"
+			"xAxis: {\n"
+			"categories: [\n";
 
 	for (auto temphead : aggregate_columns)
 	{
-			fwrite << "'" << temphead << "',\n";
+		fwrite << "'" << temphead << "',\n";
 	}
-	fwrite
-			<< "]\n"
-					"},\n"
-					"yAxis:\n"
-					"{\n"
-					"min: 0,\n"
-					"title:\n"
-					"{\n"
-					"text: 'params'\n"
-					"}\n"
-					"},\n"
-					"tooltip: {\n"
-					"   headerFormat: '<span style=\"font-size:10px\">{point.key}</span><table>',\n"
-					"  pointFormat: '<tr><td style=\"color:{series.color};padding:0\">{series.name}: </td>' +\n"
-					"     '<td style=\"padding:0\"><b>{point.y:.1f} </b></td></tr>',\n"
-					"footerFormat: '</table>',\n"
-					"shared: true,\n"
-					"useHTML: true\n"
-					"},\n"
-					"plotOptions:\n"
-					"{\n"
-					"	column:\n"
-					"	{\n"
-					"		pointPadding: 0.2,\n"
-					"		borderWidth: 0\n"
-					"	}\n"
-					"},\n"
-					"series: [\n";
+	fwrite << "]\n"
+			"},\n"
+			"yAxis:\n"
+			"{\n"
+			"min: 0,\n"
+			"title:\n"
+			"{\n"
+			"text: 'params'\n"
+			"}\n"
+			"},\n"
+			"tooltip: {\n"
+			"   headerFormat: '<span style=\"font-size:10px\">{point.key}</span><table>',\n"
+			"  pointFormat: '<tr><td style=\"color:{series.color};padding:0\">{series.name}: </td>' +\n"
+			"     '<td style=\"padding:0\"><b>{point.y:.1f} </b></td></tr>',\n"
+			"footerFormat: '</table>',\n"
+			"shared: true,\n"
+			"useHTML: true\n"
+			"},\n"
+			"plotOptions:\n"
+			"{\n"
+			"	column:\n"
+			"	{\n"
+			"		pointPadding: 0.2,\n"
+			"		borderWidth: 0\n"
+			"	}\n"
+			"},\n"
+			"series: [\n";
 
 	for (auto temp_cur_row : table)
-		{
+	{
 		auto current_row = temp_cur_row.second;
 		fwrite << "{\n";
-		fwrite << "name: '" << temp_cur_row.first<< "', data\n: [";
+		fwrite << "name: '" << temp_cur_row.first << "', data\n: [";
 		for (auto row_head : aggregate_columns)
 		{
 			if (current_row.find(row_head) != current_row.end())
 			{
-				fwrite << current_row.find(row_head)->second<< ",";;
+				fwrite << current_row.find(row_head)->second << ",";
+				;
 			}
 			else
 			{
@@ -162,8 +160,7 @@ void DLOG_TABLE_MAP::table_emit_graph_javascript(std::fstream &fwrite)
 
 void DLOG_TABLE_MAP::table_emit_graph_div(std::fstream &fwrite)
 {
-	fwrite << "<div id=\"container" << filter_string(table_name)
-			<< "\" style=\"max-width: 1024px; height: 400px; margin: 0 auto\"></div>\n";
+	fwrite << "<div id=\"container" << filter_string(table_name) << "\" style=\"max-width: 1024px; height: 400px; margin: 0 auto\"></div>\n";
 }
 
 void DLOG_TABLE_MAP::table_html_dump_unwrap(std::fstream &fwrite, int hold)
@@ -175,12 +172,11 @@ void DLOG_TABLE_MAP::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 		table_html_header(fwrite);
 		if (drawGraph == 1)
 		{
-		table_emit_graph_javascript(fwrite);
+			table_emit_graph_javascript(fwrite);
 		}
 		table_html_header_end(fwrite);
 	}
-	fwrite << "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" id=\""
-			<< filter_string(table_name) << "\" class=\"sortable\">\n";
+	fwrite << "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" id=\"" << filter_string(table_name) << "\" class=\"sortable\">\n";
 
 	fwrite << "<thead><tr>" << "\n";
 
@@ -223,7 +219,7 @@ void DLOG_TABLE_MAP::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 		{
 			table_emit_graph_div(fwrite);
 		}
-		std::vector<std::string> tempvec;
+		std::vector < std::string > tempvec;
 		tempvec.push_back(table_name);
 		table_html_footer(fwrite, tempvec);
 		fwrite.close();
@@ -239,6 +235,37 @@ void DLOG_TABLE_MAP::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 		std::cout << "DLOG Table Error: " << strerror(errno) << '\n';
 
 }
+
+void DLOG_TABLE_MAP::table_csv_dump(std::ostream &fwrite)
+{
+	fwrite << "Table: " << table_name << "\n";
+
+	for (auto row_head : aggregate_columns)
+	{
+		fwrite << row_head << ",";
+	}
+	fwrite << "\n";
+	for (auto temp_cur_row : table)
+	{
+		auto current_row = temp_cur_row.second;
+
+		fwrite << temp_cur_row.first;
+		fwrite << ",";
+		for (auto row_head : aggregate_columns)
+		{
+			if (current_row.find(row_head) != current_row.end())
+			{
+				fwrite << current_row.find(row_head)->second<<",";
+			}
+			else
+			{
+				fwrite << ",";
+			}
+		}
+		fwrite << "\n";
+	}
+}
+
 void DLOG_TABLE_MAP::table_html_dump()
 {
 
@@ -265,35 +292,33 @@ void DLOG_TABLE_MAP::insert_elem(string row, string column, string value)
 
 }
 
-
 class DLOG_TABLES_MAP
 {
 	std::vector<DLOG_TABLE_MAP> tables;
 	std::string dataPath;
 
 public:
-	DLOG_TABLES_MAP(const char *OUT_FILE,
-			std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
+	DLOG_TABLES_MAP(const char *OUT_FILE, std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
 	{
 		dataPath = inpPath + std::string(OUT_FILE);
 	}
 
-	void show_graph(TID_PAIR tid)
+	void show_graph(int tid)
 	{
 		tables.at(tid).drawGraph = 1;
 	}
 
-	TID_PAIR newtable(const char *tablename)
+	int newtable(const char *tablename)
 	{
 
 		DLOG_TABLE_MAP *temptable = new DLOG_TABLE_MAP(dataPath.c_str(), tablename);
 		tables.push_back(*temptable);
-		return TID_PAIR(tables.size() - 1);
+		return int(tables.size() - 1);
 	}
 
-	void insert_elem(TID_PAIR tid, string row, string column, string value)
+	void insert_elem(int tid, string row, string column, string value)
 	{
-		tables.at(tid).insert_elem(row,column,value);
+		tables.at(tid).insert_elem(row, column, value);
 	}
 
 	void html_dump()
@@ -312,7 +337,7 @@ public:
 			}
 		}
 		table_html_header_end(fwrite);
-		std::vector<std::string> names;
+		std::vector < std::string > names;
 		for (auto temptable : tables)
 		{
 			if (temptable.aggregate_columns.size() == 0)
