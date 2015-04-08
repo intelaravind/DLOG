@@ -85,7 +85,7 @@ public:
 	 */
 	DLOG();
 	DLOG(const char *, int, const char *,
-			std::string path = getenv("DLOG_OUTPUT_FOLDER"));
+	     char *path = getenv("DLOG_OUTPUT_FOLDER"));
 	~DLOG();
 
 	void tag_handler(std::string);

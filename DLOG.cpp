@@ -36,12 +36,26 @@ static int gid = 0;
  * @param inpPath : The path of output file. If none is given the environment variable DLOG_OUTPUT_FOLDER is used
  */
 DLOG::DLOG(const char * userfile, int lineno, const char *OUT_FILE,
-		std::string inpPath)
+		char *inpPath_p)
 {
+  std::string syscommand;
+  int status;
+  std::string inpPath;
+  if (!inpPath_p) {
+    inpPath = "dlog_output/";
+  } else {
+    inpPath = inpPath_p;
+  }
+
+    syscommand = "mkdir -p " + inpPath;
+    status = system(syscommand.c_str());
+    if (status < 0)
+      std::cout << "DLOG Error: " << strerror(errno) << '\n';
+
 	DLOG::dataPath = inpPath + std::string(OUT_FILE);
 	isEnabled = true;
 
-//	std::cout << dataPath << "\n";
+	// std::cout << dataPath << "\n";
 
 	outputmode = DLOG_OUTPUT_FILE;
 
@@ -50,7 +64,7 @@ DLOG::DLOG(const char * userfile, int lineno, const char *OUT_FILE,
 
 	std::string syscall = "rm -f " + DLOG::dataPath;
 
-	int status = system(syscall.c_str());
+	status = system(syscall.c_str());
 	if (status < 0)
 		std::cout << "DLOG Error: " << strerror(errno) << '\n';
 
@@ -65,7 +79,7 @@ DLOG::DLOG(const char * userfile, int lineno, const char *OUT_FILE,
 			<< EDIV;
 	id = gid++;
 
-	std::string syscommand;
+	
 	//copy the recovery script
 	unsigned found = datatempPath.find_last_of("/\\");
 	syscommand = "cp -r $DLOG_PATH/recover.sh " + datatempPath.substr(0, found);
