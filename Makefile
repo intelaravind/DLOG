@@ -2,6 +2,10 @@ all: enabled
 
 CPPFLAGS=-std=c++11 -O3 -fPIC #-g
 
+ifdef WITH_LLVM
+CPPFLAGS+=$(shell llvm-config --cxxflags) -DDLOG_LLVM_ENABLE
+endif
+
 enabled: 
 	g++ $(CPPFLAGS) -c DLOG.cpp -o DLOG.o
 	g++ $(CPPFLAGS) -c DLOG_HELPER.cpp -o DLOG_HELPER.o
