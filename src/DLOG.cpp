@@ -6,6 +6,7 @@
  */
 
 #include "DLOG.hpp"
+#include "config.h"
 
 DLOG::DLOG()
 {
@@ -82,7 +83,7 @@ DLOG::DLOG(const char * userfile, int lineno, const char *OUT_FILE,
 	
 	//copy the recovery script
 	unsigned found = datatempPath.find_last_of("/\\");
-	syscommand = "cp -r $DLOG_PATH/recover.sh " + datatempPath.substr(0, found);
+	syscommand = "ln -s " SRC_PATH "/recover.sh " + datatempPath.substr(0, found);
 	status = system(syscommand.c_str());
 	if (status < 0)
 		std::cout << "DLOG Error: " << strerror(errno) << '\n';
@@ -102,12 +103,12 @@ DLOG::~DLOG()
 
 	unsigned found = datatempPath.find_last_of("/\\");
 
-	syscommand = "cp -r $DLOG_PATH/js " + datatempPath.substr(0, found);
+	syscommand = "ln -s " SRC_PATH "/js " + datatempPath.substr(0, found);
 	status = system(syscommand.c_str());
 	if (status < 0)
 		std::cout << "DLOG Error: " << strerror(errno) << '\n';
 
-	syscommand = "$DLOG_PATH/DLOG_FINALIZER.out " + dataPath;
+	syscommand = SRC_PATH "/DLOG_FINALIZER.out " + dataPath;
 //	std::cout << syscommand<<"\n";
 	status = system(syscommand.c_str());
 	if (status < 0)

@@ -8,7 +8,7 @@
 #ifndef MYGRAPH_HPP_
 #define MYGRAPH_HPP_
 #include "debug_common_headers.hpp"
-
+#include "common.h"
 struct ARAV_GRAPH_VAL {
 	std::vector<double> values;
 	std::vector<std::string> key;
@@ -148,7 +148,7 @@ public:
 		std::string syscommand;
 		unsigned found = datatempPath.find_last_of("/\\");
 
-		syscommand = "cp -r $DLOG_PATH/js "
+		syscommand = "ls -s " SRC_PATH "/js "
 				+ datatempPath.substr(0, found);
 		status = system(syscommand.c_str());
 		if (status < 0)

@@ -10,7 +10,7 @@
 
 #include "DLOG_HELPER.hpp"
 #include "DLOG_TABLE_COMMON.hpp"
-
+#include "config.h"
 typedef std::vector<std::string> t_row;
 
 class DLOG_TABLE
@@ -196,7 +196,7 @@ public:
         std::string syscommand;
         //copy the recovery script
         unsigned found = dataPath.find_last_of("/\\");
-        syscommand = "cp -r $DLOG_PATH/tinytable " + dataPath.substr(0, found);
+        syscommand = "ln -s" SRC_PATH"/tinytable " + dataPath.substr(0, found);
         int status = system(syscommand.c_str());
         if (status < 0)
             std::cout << "DLOG Table Error: " << strerror(errno) << '\n';

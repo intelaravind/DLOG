@@ -10,6 +10,7 @@
 
 #include "DLOG_TABLE_COMMON.hpp"
 #include "DLOG_HELPER.hpp"
+#include "config.h"
 
 using std::map;
 using std::vector;
@@ -229,7 +230,7 @@ void DLOG_TABLE_MAP::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 	std::string syscommand;
 	//copy the recovery script
 	unsigned found = dataPath.find_last_of("/\\");
-	syscommand = "cp -r $DLOG_PATH/tinytable " + dataPath.substr(0, found);
+	syscommand = "ln -s " SRC_PATH "/tinytable " + dataPath.substr(0, found);
 	int status = system(syscommand.c_str());
 	if (status < 0)
 		std::cout << "DLOG Table Error: " << strerror(errno) << '\n';
