@@ -13,9 +13,10 @@ LT_INIT
 # Checks for programs.
 AC_PROG_CXX
 
-# Checks for libraries.
-#AC_PROG_RANLIB
+#M4
+AC_CONFIG_MACRO_DIR([m4])
 
+AC_PROG_RANLIB
 
 #find the build path
 src_full_path=`cd $srcdir && pwd`

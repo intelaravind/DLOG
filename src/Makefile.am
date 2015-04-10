@@ -1,5 +1,6 @@
 
 AM_CPPFLAGS=-std=c++11 -O3 -fPIC -I$(top_srcdir)/include -I$(top_srcdir)/#-g
+ACLOCAL_AMFLAGS=-I m4
 
 #Fix me
 #ifdef WITH_LLVM
