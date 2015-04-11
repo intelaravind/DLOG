@@ -3,20 +3,31 @@
 
 AC_PREREQ([2.69])
 AC_INIT([DLOG], [0.6], [aravind_sr@outlook.com])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Werror])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 
-#shared libary
-LT_INIT
-
-# Checks for programs.
-AC_PROG_CXX
 
 #M4
 AC_CONFIG_MACRO_DIR([m4])
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+m4_pattern_allow([AM_PROG_AR])
+AM_PROG_AR
+
+# Checks for programs.
+AC_PROG_CXX
+AC_PROG_AWK
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
 
 AC_PROG_RANLIB
+
+#shared libary
+LT_INIT
 
 #find the build path
 src_full_path=`cd $srcdir && pwd`
