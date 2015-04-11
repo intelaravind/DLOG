@@ -44,8 +44,8 @@
 #define DLOG_OUTPUT_BOTH 2
 
 #ifdef DLOG_ENABLE
-#define DLOG_CREATE(path) (__FILE__,__LINE__,path)
-#define DLOG_PRINT(obj,...)  obj.print(__FILE__,__LINE__ ,__VA_ARGS__)
+#define DLOG_CREATE(...) (__FILE__, __LINE__, __VA_ARGS__)
+#define DLOG_PRINT(obj,...)  obj.print(__FILE__, __LINE__, __VA_ARGS__)
 #else
 #define DLOG_CREATE(path);
 #define DLOG_PRINT(obj,...) ;
@@ -58,8 +58,7 @@ class DLOG
 {
 	std::string ErrorInfo;
 	std::string dataPath;
-	std::string tagPath;
-	std::string datatempPath;
+	std::string fileName;
 	bool isEnabled;
 
 	//set of known tags
@@ -84,8 +83,7 @@ public:
 	 * Used mainly to disable DLOG
 	 */
 	DLOG();
-	DLOG(const char *, int, const char *,
-	     char *path = getenv("DLOG_OUTPUT_FOLDER"));
+	DLOG(const char *, int, const char *, const char *path = getenv("DLOG_OUTPUT_FOLDER"));
 	~DLOG();
 
 	void tag_handler(std::string);

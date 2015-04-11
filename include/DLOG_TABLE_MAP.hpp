@@ -11,6 +11,7 @@
 #include "DLOG_TABLE_COMMON.hpp"
 #include "DLOG_HELPER.hpp"
 #include "config.h"
+#include "DLOG_COMMON.hpp"
 
 using std::map;
 using std::vector;
@@ -29,9 +30,10 @@ public:
 	int drawGraph;
 	set<string> aggregate_columns;
 	std::string table_name;
-	DLOG_TABLE_MAP(const char *OUT_FILE, const char *tbl_name, std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
+	std::string outfile;
+	DLOG_TABLE_MAP(const char *OUT_FILE, const char *tbl_name, const char* inpPath = getenv("DLOG_OUTPUT_FOLDER")):outfile(OUT_FILE)
 	{
-		dataPath = inpPath + std::string(OUT_FILE);
+        	dataPath = DLOG_NS::get_path(inpPath);
 		table_name = tbl_name;
 		drawGraph = 0;
 	}
@@ -227,14 +229,8 @@ void DLOG_TABLE_MAP::table_html_dump_unwrap(std::fstream &fwrite, int hold)
 
 	}
 
-	std::string syscommand;
-	//copy the recovery script
-	unsigned found = dataPath.find_last_of("/\\");
-	syscommand = "ln -s " SRC_PATH "/tinytable " + dataPath.substr(0, found);
-	int status = system(syscommand.c_str());
-	if (status < 0)
-		std::cout << "DLOG Table Error: " << strerror(errno) << '\n';
-
+	DLOG_NS::sys_call("ln -sfF " SRC_PATH"/tinytable " +  dataPath, DLOG_NS::MSG_LEVEL::quite );
+	DLOG_NS::sys_call("ln -sfF " SRC_PATH"/js " +  dataPath, DLOG_NS::MSG_LEVEL::quite );
 }
 
 void DLOG_TABLE_MAP::table_csv_dump(std::ostream &fwrite)
@@ -271,7 +267,7 @@ void DLOG_TABLE_MAP::table_html_dump()
 {
 
 	std::fstream fwrite;
-	fwrite.open(dataPath.c_str(), std::fstream::out);
+	fwrite.open(dataPath + outfile, std::fstream::out);
 
 	table_html_dump_unwrap(fwrite, NOHOLD);
 
@@ -297,11 +293,12 @@ class DLOG_TABLES_MAP
 {
 	std::vector<DLOG_TABLE_MAP> tables;
 	std::string dataPath;
+	std::string fileName;
 
 public:
-	DLOG_TABLES_MAP(const char *OUT_FILE, std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
+	DLOG_TABLES_MAP(const char *OUT_FILE, std::string inpPath = getenv("DLOG_OUTPUT_FOLDER")):  fileName(OUT_FILE)
 	{
-		dataPath = inpPath + std::string(OUT_FILE);
+		dataPath = DLOG_NS::get_path(inpPath.c_str());
 	}
 
 	void show_graph(int tid)
@@ -312,7 +309,7 @@ public:
 	int newtable(const char *tablename)
 	{
 
-		DLOG_TABLE_MAP *temptable = new DLOG_TABLE_MAP(dataPath.c_str(), tablename);
+		DLOG_TABLE_MAP *temptable = new DLOG_TABLE_MAP(fileName.c_str(), tablename, dataPath.c_str());
 		tables.push_back(*temptable);
 		return int(tables.size() - 1);
 	}
@@ -325,7 +322,7 @@ public:
 	void html_dump()
 	{
 		std::fstream fwrite;
-		fwrite.open(dataPath.c_str(), std::fstream::out);
+		fwrite.open(dataPath + "/" + fileName, std::fstream::out);
 
 		table_html_header(fwrite);
 		for (auto temptable : tables)

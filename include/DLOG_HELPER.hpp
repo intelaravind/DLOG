@@ -33,5 +33,7 @@ bool replace(std::string&, const std::string&, const std::string&);
 void replaceAll(std::string&, const std::string&, const std::string&);
 
 std::string dlog_format_string_to_html(std::string );
+std::string dlog_format_string_to_html(int);
+std::string dlog_format_string_to_html(double );
 
 #endif /* DLOG_HELPER_HPP_ */

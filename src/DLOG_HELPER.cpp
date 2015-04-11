@@ -29,3 +29,12 @@ std::string dlog_format_string_to_html(std::string obj)
 }
 
 
+std::string dlog_format_string_to_html(int obj)
+{
+	return std::to_string(obj);
+}
+
+std::string dlog_format_string_to_html(double obj)
+{
+	return std::to_string(obj);
+}

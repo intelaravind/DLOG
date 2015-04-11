@@ -11,6 +11,8 @@
 #include "DLOG_HELPER.hpp"
 #include "DLOG_TABLE_COMMON.hpp"
 #include "config.h"
+#include "DLOG_COMMON.hpp"
+
 typedef std::vector<std::string> t_row;
 
 class DLOG_TABLE
@@ -27,9 +29,9 @@ public:
     int cur_row = 0;
     int drawGraph = 0;
 
-    DLOG_TABLE(const char *OUT_FILE, const char *tbl_name, std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
+    DLOG_TABLE(const char *OUT_FILE, const char *tbl_name, const char *inpPath = getenv("DLOG_OUTPUT_FOLDER"))
     {
-        dataPath = inpPath;
+        dataPath = DLOG_NS::get_path(inpPath);
         table_name = tbl_name;
         outputfilename = OUT_FILE;
     }
@@ -193,13 +195,8 @@ public:
             fwrite.close();
         }
 
-        std::string syscommand;
-        //copy the recovery script
-        unsigned found = dataPath.find_last_of("/\\");
-        syscommand = "ln -s" SRC_PATH"/tinytable " + dataPath.substr(0, found);
-        int status = system(syscommand.c_str());
-        if (status < 0)
-            std::cout << "DLOG Table Error: " << strerror(errno) << '\n';
+	DLOG_NS::sys_call("ln -sfF " SRC_PATH"/tinytable " +  dataPath, DLOG_NS::MSG_LEVEL::quite );
+	DLOG_NS::sys_call("ln -sfF " SRC_PATH"/js " +  dataPath, DLOG_NS::MSG_LEVEL::quite );
     }
 
     void table_html_dump()
@@ -287,13 +284,13 @@ class DLOG_TABLES
     std::vector<DLOG_TABLE> tables;
     std::vector<int> header_row_populated;
     std::string dataPath;
+    std::string outFile;
 
 public:
-    DLOG_TABLES(const char *OUT_FILE, std::string inpPath = getenv("DLOG_OUTPUT_FOLDER"))
+    DLOG_TABLES(const char *OUT_FILE, const char* inpPath = getenv("DLOG_OUTPUT_FOLDER")) : outFile(OUT_FILE)
     {
 
-        dataPath = inpPath + std::string(OUT_FILE);
-        std::cout << "created tables : " << dataPath << "\n";
+        dataPath = DLOG_NS::get_path(inpPath);
     }
 
     void show_graph(TID tid)
@@ -304,7 +301,7 @@ public:
     TID newtable(const char *tablename)
     {
 
-        DLOG_TABLE *temptable = new DLOG_TABLE(dataPath.c_str(), tablename);
+        DLOG_TABLE *temptable = new DLOG_TABLE(outFile.c_str(), tablename, dataPath.c_str());
         tables.push_back(*temptable);
         header_row_populated.push_back(0);
         return TID(tables.size() - 1);
@@ -327,7 +324,7 @@ public:
     void html_dump()
     {
         std::fstream fwrite;
-        fwrite.open(dataPath.c_str(), std::fstream::out);
+        fwrite.open(dataPath + "/" + outFile , std::fstream::out);
 
         table_html_header(fwrite);
         for (auto temptable : tables)

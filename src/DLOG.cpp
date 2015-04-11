@@ -7,25 +7,13 @@
 
 #include "DLOG.hpp"
 #include "config.h"
+#include "DLOG_COMMON.hpp"
 
 DLOG::DLOG()
 {
-	isEnabled = false;
+    isEnabled = false;
 }
 
-//template<typename T>
-//void DLOG::print(const char *userfile, int lineno, T obj, ADDON addon)
-//{
-//
-//}
-//
-//template<typename T>
-//void DLOG::print(const char *userfile, int lineno, T obj, const char* tag,
-//		ADDON addon)
-//{
-//
-//
-//}
 
 static int gid = 0;
 
@@ -36,95 +24,65 @@ static int gid = 0;
  * @param OUT_FILE : The output file name.
  * @param inpPath : The path of output file. If none is given the environment variable DLOG_OUTPUT_FOLDER is used
  */
-DLOG::DLOG(const char * userfile, int lineno, const char *OUT_FILE,
-		char *inpPath_p)
+DLOG::DLOG(const char *userfile, int lineno, const char *OUT_FILE,
+           const char *inpPath_p): fileName(OUT_FILE)
 {
-  std::string syscommand;
-  int status;
-  std::string inpPath;
-  if (!inpPath_p) {
-    inpPath = "dlog_output/";
-  } else {
-    inpPath = inpPath_p;
-  }
+    std::string syscommand;
+    this->dataPath = DLOG_NS::get_path(inpPath_p);
+    id = gid++;
 
-    syscommand = "mkdir -p " + inpPath;
-    status = system(syscommand.c_str());
-    if (status < 0)
-      std::cout << "DLOG Error: " << strerror(errno) << '\n';
+    isEnabled = true;
 
-	DLOG::dataPath = inpPath + std::string(OUT_FILE);
-	isEnabled = true;
+    // std::cout << dataPath << "\n";
 
-	// std::cout << dataPath << "\n";
+    outputmode = DLOG_OUTPUT_FILE;
 
-	outputmode = DLOG_OUTPUT_FILE;
+    syscommand = "rm -f " + this->dataPath + "/" + fileName;
 
-	datatempPath = DLOG::dataPath + ".temp";
-	tagPath = DLOG::dataPath + ".tag";
+    DLOG_NS::sys_call(syscommand);
 
-	std::string syscall = "rm -f " + DLOG::dataPath;
+    fdata.open(this->dataPath + "/" + fileName + ".temp", std::fstream::out);
+    ftags.open(this->dataPath + "/" + fileName + ".tag", std::fstream::out);
 
-	status = system(syscall.c_str());
-	if (status < 0)
-		std::cout << "DLOG Error: " << strerror(errno) << '\n';
+    //insert known tags to taglist
+    tag_handler("SYSTEM");
+    tag_handler("CALLINFO");
 
-	fdata.open(datatempPath.c_str(), std::fstream::out);
-	ftags.open(tagPath.c_str(), std::fstream::out);
+    fdata << DIV("SYSTEM") << "Created Debugger " << GREEN(id) << CALLINFO
+          << EDIV;
 
-	//insert known tags to taglist
-	tag_handler("SYSTEM");
-	tag_handler("CALLINFO");
-
-	fdata << DIV("SYSTEM") << "Created Debugger " << GREEN(id) << CALLINFO
-			<< EDIV;
-	id = gid++;
-
-	
-	//copy the recovery script
-	unsigned found = datatempPath.find_last_of("/\\");
-	syscommand = "ln -s " SRC_PATH "/recover.sh " + datatempPath.substr(0, found);
-	status = system(syscommand.c_str());
-	if (status < 0)
-		std::cout << "DLOG Error: " << strerror(errno) << '\n';
+    //copy the recovery script
+    syscommand = "ln -sfF " SRC_PATH "/recover.sh " + this->dataPath;
+    DLOG_NS::sys_call(syscommand);
 }
 
 DLOG::~DLOG()
 {
 
-	if(isEnabled==false)
-		return;
-	std::string syscommand;
-	int status;
+    if(isEnabled == false)
+        return;
+    std::string syscommand;
+    int status;
 
-	fdata << DIV("SYSTEM") << "Destroyed Debugger " << GREEN(id) << EDIV;
-	fdata.close();
-	ftags.close();
+    fdata << DIV("SYSTEM") << "Destroyed Debugger " << GREEN(id) << EDIV;
+    fdata.close();
+    ftags.close();
 
-	unsigned found = datatempPath.find_last_of("/\\");
+    syscommand = "ln -sfF " SRC_PATH "/js " + dataPath;
+    DLOG_NS::sys_call(syscommand);
 
-	syscommand = "ln -s " SRC_PATH "/js " + datatempPath.substr(0, found);
-	status = system(syscommand.c_str());
-	if (status < 0)
-		std::cout << "DLOG Error: " << strerror(errno) << '\n';
-
-	syscommand = SRC_PATH "/DLOG_FINALIZER.out " + dataPath;
-//	std::cout << syscommand<<"\n";
-	status = system(syscommand.c_str());
-	if (status < 0)
-		std::cout << "DLOG Error: " << strerror(errno) << '\n';
-
+    syscommand = SRC_PATH "/DLOG_FINALIZER " + dataPath + "/" + fileName;
+    DLOG_NS::sys_call(syscommand);
+    
 #if (DLOG_KEEP_TEMP_FILES ==0)
 
-	syscommand = "rm -f " + datatempPath;
-	status = system(syscommand.c_str());
-	if (status < 0)
-		std::cout << "DLOG Error: " << strerror(errno) << '\n';
+    //.temp
+    syscommand = "rm -f " + dataPath + "/" + fileName + ".temp";
+    DLOG_NS::sys_call(syscommand);
 
-	syscommand = "rm -f " + tagPath;
-	status = system(syscommand.c_str());
-	if (status < 0)
-		std::cout << "DLOG Error: " << strerror(errno) << '\n';
+    //.tag
+    syscommand = "rm -f " + dataPath + "/" + fileName + ".tag";
+    DLOG_NS::sys_call(syscommand);
 #endif
 
 }
@@ -135,7 +93,7 @@ DLOG::~DLOG()
  */
 void DLOG::set_output_mode(int mode)
 {
-	outputmode = mode;
+    outputmode = mode;
 }
 
 /**
@@ -145,15 +103,15 @@ void DLOG::set_output_mode(int mode)
 void DLOG::tag_handler(std::string input)
 {
 
-	std::pair<std::set<std::string>::iterator, bool> ret;
-	ret = tagset.insert(input);
+    std::pair<std::set<std::string>::iterator, bool> ret;
+    ret = tagset.insert(input);
 
-	//A new element was inserted so add it to file
-	if (ret.second == true && input.compare("CALLINFO") != 0)
-	{
-		ftags << CHKBOX(input);
-		ftags.flush();
-	}
+    //A new element was inserted so add it to file
+    if (ret.second == true && input.compare("CALLINFO") != 0)
+    {
+        ftags << CHKBOX(input);
+        ftags.flush();
+    }
 
 }
 
@@ -164,3 +122,5 @@ void DLOG::print()
 {
 
 }
+
+
