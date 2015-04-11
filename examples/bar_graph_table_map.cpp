@@ -9,7 +9,7 @@
  * compile with g++ bar_graph_table_map.cpp -std=c++11
  */
 
-#include "../DLOG_TABLE_MAP.hpp"
+#include "DLOG_TABLE_MAP.hpp"
 
 using namespace std;
 

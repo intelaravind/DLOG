@@ -11,13 +11,10 @@
  * compile with g++ bar_graph_multiple.cpp -std=c++11
  */
 
-#include "../DLOG_TABLE.hpp"
+#include "DLOG_TABLE.hpp"
 #include <vector>
 
-//NOTE: DLOG_BAR_GRAPH requires the data to be in dlog table
 using namespace std;
-
-//The only thing to be done is call the function tables.show_graph() for the tables you need to show graph
 
 int main()
 {
@@ -26,7 +23,7 @@ int main()
 
 	//table 1
 	{
-		TID_PAIR table_fruits = tables.newtable("fruits");
+		auto table_fruits = tables.newtable("fruits");
 
 		/*The header row*/
 		vector<string> head_row;
@@ -66,7 +63,7 @@ int main()
 
 	//table 2
 	{
-		TID_PAIR table_cars = tables.newtable("cars");
+		auto table_cars = tables.newtable("cars");
 
 		/*The header row*/
 		vector<string> head_row;
@@ -103,7 +100,7 @@ int main()
 
 	//table 3
 	{
-		TID_PAIR table_currency = tables.newtable("currency");
+		auto table_currency = tables.newtable("currency");
 
 		/*The header row*/
 		vector<string> head_row;

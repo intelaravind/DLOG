@@ -1,4 +1,4 @@
-#include "../DLOG.hpp"
+#include "DLOG.hpp"
 
 
 /*

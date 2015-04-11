@@ -1,9 +1,9 @@
-#include "../DLOG.hpp"
+#include "DLOG.hpp"
 
 
 /*
  * Compile:
- * 	g++ DLOG_SIMPLE.cpp -o DLOG_SIMPLE.out ../lib/libDLOG.a
+ * 	g++ DLOG_SIMPLE.cpp -o DLOG_SIMPLE.out ../.libs/libDLOG.a
  */
 
 //define DLOG_DISABLE in DLOG.hpp or pass -DDLOG_DISABLE to disable the dlog.
@@ -21,7 +21,7 @@
 
 int main(int argc, char **argv)
 {
-	DLOG dbg DLOG_CREATE("DLOG_SIMPLE.html");
+	DLOG dbg DLOG_CREATE("DLOG_SIMPLE.html","./output/");
 
 	//testing string
 	DLOG_PRINT(dbg, "testing with string");

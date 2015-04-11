@@ -9,7 +9,7 @@
  * compile with g++ DLOG_TABLE_MAP_SIMPLE_Multiple.cpp -std=c++11
  */
 
-#include "../DLOG_TABLE_MAP.hpp"
+#include "DLOG_TABLE_MAP.hpp"
 #include <vector>
 
 //NOTE: DLOG_TABLE do not have crash support
@@ -21,7 +21,7 @@ int main()
 
 	//table 1
 	{
-		TID_PAIR table_fruits = tables.newtable("fruits");
+		auto table_fruits = tables.newtable("fruits");
 		tables.insert_elem(table_fruits, "Apple", "sold", "100");
 		tables.insert_elem(table_fruits, "Apple", "stockleft", "20");
 		tables.insert_elem(table_fruits, "Apple", "somevalue", "50");
@@ -37,7 +37,7 @@ int main()
 
 	//table 2
 	{
-		TID_PAIR table_cars = tables.newtable("cars");
+		auto table_cars = tables.newtable("cars");
 
 		/*Row 1*/
 		tables.insert_elem(table_cars, "Ferrari", "sold", "200");

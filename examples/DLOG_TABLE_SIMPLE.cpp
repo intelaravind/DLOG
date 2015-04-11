@@ -15,7 +15,7 @@
  * See DLOG_TABLE_MAP_SIMPLE.cpp for a flexible table
  */
 
-#include "../DLOG_TABLE.hpp"
+#include "DLOG_TABLE.hpp"
 #include <vector>
 
 //NOTE: DLOG_TABLE do not have crash support

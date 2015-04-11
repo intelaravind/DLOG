@@ -11,13 +11,10 @@
  * compile with g++ bar_graph.cpp -std=c++11
  */
 
-#include "../DLOG_TABLE.hpp"
+#include "DLOG_TABLE.hpp"
 #include <vector>
 
-//NOTE: DLOG_BAR_GRAPH requires the data to be in dlog table
 using namespace std;
-
-//The only thing to be done is table.drawGraph = 1;
 
 int main()
 {

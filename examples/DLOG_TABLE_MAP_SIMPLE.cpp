@@ -10,7 +10,7 @@
  */
 
 
-#include "../DLOG_TABLE_MAP.hpp"
+#include "DLOG_TABLE_MAP.hpp"
 #include <iostream>
 using namespace std;
 
@@ -38,7 +38,7 @@ int main()
 //	table.table_dump(); // to dump on screen
 	std::ostream out(std::cout.rdbuf()); //dump csv screen
 	table.table_csv_dump(out);
-//	table.table_html_dump();
+	table.table_html_dump();
 
 
 

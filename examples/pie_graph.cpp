@@ -3,7 +3,7 @@
  */
 
 
-#include "../DLOG_PIE_GRAPH.hpp"
+#include "DLOG_PIE_GRAPH.hpp"
 
 int main() {
 	DLOG_PIE_GRAPH testgraph("APOLLO_test_graph.html");
