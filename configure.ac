@@ -50,5 +50,6 @@ chmod +x recover.sh
 AC_CHECK_FUNCS([clock_gettime strerror])
 
 AC_CONFIG_FILES([Makefile
+		examples/Makefile
                  src/Makefile])
 AC_OUTPUT

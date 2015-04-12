@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src
+SUBDIRS = src examples
 
 AM_CPPFLAGS=-std=c++11 -O3 -I$(top_srcdir)/include -I$(top_srcdir)/#-g
 
