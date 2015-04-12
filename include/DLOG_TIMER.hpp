@@ -115,7 +115,7 @@ public:
         mut.unlock();
     }
 
-    void stop(std::string name, std::string info="")
+    long stop(std::string name, std::string info="")
     {
         struct timespec stop;
         if (clock_gettime(CLOCK_REALTIME, &stop) == -1)
@@ -159,13 +159,11 @@ public:
         return cummul;
     }
 
-    void output_html_table(std::string filename, std::string tablename = "unnamed", std::string path = "", DLOG_TIMER_OPTIONS options = DLOG_TIMER_OPTIONS())
+    void output_html_table(const char* filename, const char* tablename = "unnamed", const char* path = getenv("DLOG_OUTPUT_FOLDER"), DLOG_TIMER_OPTIONS options = DLOG_TIMER_OPTIONS())
     {
 
-        if (path == "")
-            path = getenv("DLOG_OUTPUT_FOLDER");
 
-        DLOG_TABLE table(filename.c_str(), tablename.c_str(), path);
+        DLOG_TABLE table(filename, tablename, path);
         std::vector<std::string> head_row;
 
         head_row.push_back("Name");
@@ -247,13 +245,13 @@ public:
         }
         mut.unlock();
     }
-    void events_html_gantt(std::string filename, std::string tablename = "unnamed", std::string path = "")
+    void events_html_gantt(const char* filename, const char* tablename = "unnamed", const char* inpath = getenv("DLOG_OUTPUT_FOLDER"))
     {
         mut.lock();
-        if (path == "")
-            path = getenv("DLOG_OUTPUT_FOLDER");
 
-        DLOG_TABLE table(filename.c_str(), tablename.c_str(), path);
+	std::string path = DLOG_NS::get_path(inpath);
+
+        DLOG_TABLE table(filename, tablename, path.c_str());
         std::vector < std::string > head_row;
 
 	head_row.push_back("Info");

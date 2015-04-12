@@ -203,7 +203,7 @@ public:
     {
         std::fstream fwrite;
 
-        std::string fullpath = dataPath + outputfilename;
+        std::string fullpath = dataPath + "/" + outputfilename;
         //std::cerr<<"************fullpath = "<<fullpath<<"\n";
         fwrite.open(fullpath.c_str(), std::fstream::out);
         table_html_dump_unwrap(fwrite, NOHOLD);
@@ -212,7 +212,7 @@ public:
     void table_gantt_dump()
     {
         std::fstream fwrite;
-        std::string fullpath = dataPath + outputfilename;
+        std::string fullpath = dataPath + "/" + outputfilename;
         fwrite.open(fullpath.c_str(), std::fstream::out);
 
         fwrite << R"(

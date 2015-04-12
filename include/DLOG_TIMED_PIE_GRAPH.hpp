@@ -11,54 +11,60 @@
 #include "DLOG_PIE_GRAPH.hpp"
 #include "DLOG_TIMER.hpp"
 
-typedef std::pair<int,int> TID_PAIR;
 
 class DLOG_TIMED_PIE_GRAPH
 {
-	DLOG_PIE_GRAPH *pie_graph;
-	std::vector<DLOG_TIMER> timer;
-	std::vector<std::string> items;
+    DLOG_PIE_GRAPH *pie_graph;
+    std::map<std::string, DLOG_TIMER*> timer_list;
 
 public:
 
-	DLOG_TIMED_PIE_GRAPH(const char *PATH)
-	{
-		pie_graph = new DLOG_PIE_GRAPH(PATH);
-	}
+    DLOG_TIMED_PIE_GRAPH(const char *fileName, const char *path = getenv("DLOG_OUTPUT_FOLDER"))
+    {
+        pie_graph = new DLOG_PIE_GRAPH(fileName, path);
+    }
 
-	int newgraph(const char * name, const char *title)
-	{
-		DLOG_TIMER temp;
-		timer.push_back(temp);
-		return pie_graph->dlog_add_graph(name, title);
-	}
+    void newgraph(const char *name, const char *title = "")
+    {
+        timer_list[name] = new DLOG_TIMER();
+	pie_graph->dlog_add_graph(name, title);
+    }
 
-	TID_PAIR start_new(int graph_id, const char* item)
-	{
-		items.push_back(std::string(item));
-		int tempid= timer[graph_id].start_new();
-		return TID_PAIR(graph_id,tempid);
-	}
-	long int stop(TID_PAIR id)
-	{
+    void start(const char* graph_id, const char* item)
+    {
+        if(timer_list.find(graph_id) != timer_list.end())
+        {
+            timer_list[graph_id]->start(item);
+        }
+        else
+        {
+            std::cerr << "DLOG(ERROR) : Unknown graph id!!!\n";
+        }
+    }
+    void stop(const char* graph_id, const char* timer_id)
+    {
+        timer_list[graph_id]->stop(timer_id);
+    }
+    void reset(const char* graph_id, const char* timer_id)
+    {
+        timer_list[graph_id]->reset();
+    }
+    ~DLOG_TIMED_PIE_GRAPH()
+    {
+        for(auto items : timer_list)
+        {
+	    auto time_list = items.second->get_cummulative_times();
+	    
+	    for(auto single_timer_item : time_list)
+	    {
+		pie_graph->dlog_insert_val(items.first.c_str(), single_timer_item.second , single_timer_item.first.c_str());
+	    }
 
-		int graph_id = id.first;
-		int timer_id = id.second;
-		long int time = timer[graph_id].stop(timer_id);
-
-		pie_graph->dlog_insert_val(graph_id, time, items[timer_id].c_str());
-		return time;
-	}
-	long int reset(TID_PAIR id)
-	{
-		int graph_id = id.first;
-		int timer_id = id.second;
-		timer[graph_id].reset(timer_id);
-	}
-	~DLOG_TIMED_PIE_GRAPH()
-	{
-		delete pie_graph;
-	}
+            delete items.second;
+        }
+        delete pie_graph;
+    }
 };
 
 #endif /* DLOG_TIMED_PIE_GRAPH_HPP_ */
+

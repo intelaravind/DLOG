@@ -13,6 +13,7 @@
 
 #include <string.h>
 #include <iostream>
+#include <algorithm>
 
 namespace DLOG_NS
 {
@@ -51,6 +52,14 @@ static std::string get_path(const char* path)
     r_path = (path)?path:"dlog_output/";
     create_directory_if_not_exist(r_path);
     return r_path;
+
+}
+
+static std::string strip_space(const char *input)
+{
+	std::string str(input);
+	str.erase(remove_if(str.begin(), str.end(), isspace), str.end());
+	return str;
 
 }
 

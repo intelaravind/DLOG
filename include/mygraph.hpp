@@ -8,153 +8,148 @@
 #ifndef MYGRAPH_HPP_
 #define MYGRAPH_HPP_
 #include "debug_common_headers.hpp"
-#include "common.h"
-struct ARAV_GRAPH_VAL {
-	std::vector<double> values;
-	std::vector<std::string> key;
-	double total;
+#include "config.h"
+#include "DLOG_COMMON.hpp"
+
+struct ARAV_GRAPH_VAL
+{
+    std::vector<double> values;
+    std::vector<std::string> key;
+    double total;
 };
 
-class aravgraph {
-	std::string ErrorInfo;
-	std::string dataPath;
-	std::string datatempPath;
-	std::vector<ARAV_GRAPH_VAL> graphs;
-	std::vector<std::string> graph_names;
-	std::vector<std::string> graph_titles;
-	int graph_uid;
+class aravgraph
+{
+    std::string ErrorInfo;
+    std::string dataPath;
+    std::string fileName;
+    std::map<std::string, ARAV_GRAPH_VAL> graphs;
+    std::map<std::string, std::string> graph_titles;
+    int graph_uid;
 
 public:
 
-	aravgraph(const char *PATH) {
+    aravgraph(const char* in_fileName, const char *path):fileName(in_fileName)
+    {
 
-		graph_uid = 0;
-		dataPath = getenv("DLOG_OUTPUT_FOLDER") + std::string(PATH);
-		datatempPath = dataPath + ".temp";
+        graph_uid = 0;
+        dataPath = DLOG_NS::get_path(path);
+        std::string syscall = "rm -rf " + dataPath + "/*";
+        DLOG_NS::sys_call(syscall);
+    }
 
-		std::string syscall = "rm -f " + dataPath;
-		int status = system(syscall.c_str());
-		if (status < 0)
-			std::cout << "DLOG Error: " << strerror(errno) << '\n';
+    int newgraph(const char *name, const char *title)
+    {
 
-	}
+        ARAV_GRAPH_VAL tempgraph;
+        graphs[name]= tempgraph;
+        graph_titles[name] = title;
+        return graph_uid++;
+    }
 
-	int newgraph(const char * name, const char *title) {
+    void insertval(const char* graphid, double val, const char *key)
+    {
+        ARAV_GRAPH_VAL *temp = &graphs[graphid];
+        temp->values.push_back(val);
+        temp->key.push_back(key);
+        temp->total += val;
+    }
 
-		ARAV_GRAPH_VAL tempgraph;
-		graphs.push_back(tempgraph);
-		graph_names.push_back(name);
-		graph_titles.push_back(title);
-		return graph_uid++;
-	}
+    ~aravgraph()
+    {
 
-	void insertval(int graphid, double val, const char *key) {
-		ARAV_GRAPH_VAL *temp = &graphs[graphid];
-		temp->values.push_back(val);
-		temp->key.push_back(key);
-		temp->total += val;
-	}
+        int i;
+        std::fstream fwrite;
+        fwrite.open(dataPath + "/" + fileName, std::fstream::out);
 
-	~aravgraph() {
+        fwrite
+                << "<html>	<head>	<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n"
+                "<title>DLOG graph</title>\n"
+                "<script type='text/javascript' src='js/jquery-2.0.3.min.js'></script>\n"
+                "<script type='text/javascript' src='js/highcharts.js'></script>\n"
+                "<script type='text/javascript' src='js/modules/exporting.js'></script>\n";
 
-		int i;
-		std::fstream fwrite;
-		fwrite.open(dataPath.c_str(), std::fstream::out);
+        fwrite << "<script type=\"text/javascript\">\n"
+               "$(function () {\n";
+        
+	fwrite << "$(document).ready(function () {\n";
 
-		fwrite
-				<< "<html>	<head>	<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n"
-						"<title>DLOG graph</title>\n"
-						"<script type='text/javascript' src='js/jquery-2.0.3.min.js'></script>\n"
-						"<script type='text/javascript' src='js/highcharts.js'></script>\n"
-						"<script type='text/javascript' src='js/modules/exporting.js'></script>\n";
+        for (auto temp_graph_couple : graphs)
+        {
 
-		fwrite << "<script type=\"text/javascript\">\n"
-				"$(function () {\n";
+            fwrite << " $('#container" << DLOG_NS::strip_space(temp_graph_couple.first.c_str()) << "').highcharts({";
 
-		for (i = 0; i < graph_uid; i++) {
-			fwrite << "var chart" << i << ";\n";
-		}
-		fwrite << "$(document).ready(function () {\n";
+            fwrite << "            chart: {"
+                   "plotBackgroundColor: null,"
+                   "plotBorderWidth: null,"
+                   "plotShadow: false"
+                   " },"
+                   " title: {"
+                   "text: '" << graph_titles[temp_graph_couple.first]
+                   << "'"
+                   "},"
+                   " tooltip: {"
+                   " pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'"
+                   "},"
+                   "plotOptions: {"
+                   " pie: {"
+                   "allowPointSelect: true,"
+                   "cursor: 'pointer',"
+                   "dataLabels: {"
+                   "enabled: false"
+                   "},"
+                   "showInLegend: true"
+                   "}"
+                   "},"
+                   "series: [{"
+                   "type: 'pie',"
+                   " name: '" << temp_graph_couple.first << "',"
+                   << "data: [\n";
 
-		for (i = 0; i < graph_uid; i++) {
+            ARAV_GRAPH_VAL *temp_graph = &temp_graph_couple.second;
 
-			fwrite << " $('#container" << i << "').highcharts({";
+            if (temp_graph == NULL)
+            {
+                std::cout << "ERROR: GRAPH NULL\n";
+                exit(1);
+            }
 
-			fwrite << "            chart: {"
-					"plotBackgroundColor: null,"
-					"plotBorderWidth: null,"
-					"plotShadow: false"
-					" },"
-					" title: {"
-					"text: '" << graph_titles[i].c_str()
-					<< "'"
-							"},"
-							" tooltip: {"
-							" pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'"
-							"},"
-							"plotOptions: {"
-							" pie: {"
-							"allowPointSelect: true,"
-							"cursor: 'pointer',"
-							"dataLabels: {"
-							"enabled: false"
-							"},"
-							"showInLegend: true"
-							"}"
-							"},"
-							"series: [{"
-							"type: 'pie',"
-							" name: '" << graph_names[i].c_str() << "',"
-					<< "data: [\n";
+            for (unsigned int j = 0; j < temp_graph->values.size(); j++)
+            {
 
-			ARAV_GRAPH_VAL *temp_graph = &graphs[i];
+                char tempformater[20];
+                sprintf(tempformater, "%.1f", temp_graph->values[j]);
 
-			if (temp_graph == NULL) {
-				std::cout << "ERROR: GRAPH NULL\n";
-				exit(1);
-			}
+                fwrite << "['" << temp_graph->key[j] << "',";
+                fwrite << tempformater;
+                fwrite << "],\n";
 
-			for (unsigned int j = 0; j < temp_graph->values.size(); j++) {
+            }
 
-				char tempformater[20];
-				sprintf(tempformater, "%.1f", temp_graph->values[j]);
+            fwrite << "]}]});\n";
 
-				fwrite << "['" << temp_graph->key[j] << "',";
-				fwrite << tempformater;
-				fwrite << "],\n";
+        }
 
-			}
+        fwrite << "});});\n";
 
-			fwrite << "]}]});\n";
+        fwrite << "	</script>"
+               "</head>"
+               "<body>";
 
-		}
+	for (auto temp_graph_couple : graphs)
+        {
+            fwrite << "<div id=\"container" << DLOG_NS::strip_space(temp_graph_couple.first.c_str())
+                   << "\"style=\"width: 310px; height: 400px; margin: 0 auto\"></div>";
+        }
 
-		fwrite << "});});\n";
+        fwrite << "	</body></html>\n";
 
-		fwrite << "	</script>"
-				"</head>"
-				"<body>";
+        fwrite.close();
 
-		for (i = 0; i < graph_uid; i++) {
-			fwrite << "<div id=\"container" << i
-					<< "\"style=\"width: 310px; height: 400px; margin: 0 auto\"></div>";
-		}
 
-		fwrite << "	</body></html>\n";
-
-		fwrite.close();
-
-		int status;
-		std::string syscommand;
-		unsigned found = datatempPath.find_last_of("/\\");
-
-		syscommand = "ls -s " SRC_PATH "/js "
-				+ datatempPath.substr(0, found);
-		status = system(syscommand.c_str());
-		if (status < 0)
-			std::cout << "DLOG Error: " << strerror(errno) << '\n';
-
-	}
+        std::string syscommand = "ln -sfF " SRC_PATH "/js " + dataPath;
+        DLOG_NS::sys_call(syscommand);
+    }
 };
 
 
@@ -163,3 +158,4 @@ public:
 
 
 #endif /* MYGRAPH_HPP_ */
+

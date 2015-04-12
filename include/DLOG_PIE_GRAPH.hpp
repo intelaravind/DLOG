@@ -17,18 +17,18 @@ class DLOG_PIE_GRAPH
 {
 	aravgraph* graph;
 public:
-	DLOG_PIE_GRAPH(const char *PATH)
+	DLOG_PIE_GRAPH(const char *fileName, const char *path = getenv("DLOG_OUTPUT_FOLDER"))
 	{
-		graph = new aravgraph(PATH);
+		graph = new aravgraph(fileName, path);
 	}
 
-	int dlog_add_graph(const char * name, const char *title)
+	int dlog_add_graph(const char *name, const char *desc)
 	{
-		return graph->newgraph(name, title);
+		return graph->newgraph(name, desc);
 
 	}
 
-	void dlog_insert_val(int graphid, double val, const char *key)
+	void dlog_insert_val(const char* graphid, double val, const char *key)
 	{
 		graph->insertval(graphid, val, key);
 	}

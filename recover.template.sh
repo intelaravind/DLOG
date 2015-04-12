@@ -8,7 +8,7 @@ search_dir=`pwd`
 for entry in "$search_dir"/*.tag
 do
 #  echo "${entry%.*}"
-$SRC_PATH/DLOG_FINALIZER.out ${entry%.*}
+$SRC_PATH/DLOG_FINALIZER ${entry%.*}
 done
 
 
