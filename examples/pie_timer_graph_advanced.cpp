@@ -4,35 +4,34 @@
  */
 
 //compile with -lrt flag
-#include "../DLOG_TIMED_PIE_GRAPH.hpp"
+#include "DLOG_TIMED_PIE_GRAPH.hpp"
 
 int main()
 {
-	DLOG_TIMED_PIE_GRAPH testgraph("APOLLO_test_timed_graph_adv.html");
+    DLOG_TIMED_PIE_GRAPH testgraph("APOLLO_test_timed_graph_adv.html", "./output");
 
-	int graph_id = testgraph.newgraph("graph1", "just testing graph1 pie");
+    testgraph.newgraph("graph1");
 
-	int graph_id2 = testgraph.newgraph("graph2", "just testing graph1 pie");
+    testgraph.newgraph("graph2");
 
-	TID_PAIR t1, t2, t3, t4, t5;
+    testgraph.start("graph2", "super full");
+    testgraph.start("graph1", "full");
+    testgraph.start("graph1", "first");
+    sleep(2);
+    testgraph.stop("graph1","first");
+    testgraph.start("graph1", "second");
+    sleep(3);
+    testgraph.stop("graph1","second");
+    testgraph.stop("graph1","full");
 
-	t4 = testgraph.start_new(graph_id2, "super Full");
-	t1 = testgraph.start_new(graph_id, "Full");
-	t2 = testgraph.start_new(graph_id, "first");
-	sleep(2);
-	testgraph.stop(t2);
-	t3 = testgraph.start_new(graph_id, "second");
-	sleep(3);
-	testgraph.stop(t3);
-	testgraph.stop(t1);
+    testgraph.start("graph2", "super small");
+    sleep(1);
+    testgraph.stop("graph2","super small");
 
-	t5 = testgraph.start_new(graph_id2, "super small");
-	sleep(1);
-	testgraph.stop(t5);
+    testgraph.stop("graph2","super full");
 
-	testgraph.stop(t4);
+    //the second graph
 
-	//the second graph
-
-	return 0;
+    return 0;
 }
+
