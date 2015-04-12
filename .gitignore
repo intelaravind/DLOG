@@ -1,4 +1,77 @@
 *.tag
 *.temp
-*.swp
 *~
+
+### C ###
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+
+
+### Vim ###
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+#others
+.dirstamp
+.deps
+stamp-h1
+*.log
+/autom4te.cache
+.libs
+DLOG_FINALIZER
+Makefile
+config.h
+config.status
+configure.scan
+
+examples/bar_graph
+examples/bar_graph_multiple
+examples/bar_graph_multiple_table
+examples/bar_graph_table_map
+examples/dlog_simple
+examples/dlog_simple_crash
+examples/dlog_table_map_simple
+examples/dlog_table_map_simple_multiple
+examples/dlog_table_simple
+examples/dlog_table_simple2_multiple
+examples/output/
+examples/pie_graph
+examples/pie_timer_graph_advanced
+examples/pie_timer_graph_simple
+examples/simple_timer
+recover.sh
+
