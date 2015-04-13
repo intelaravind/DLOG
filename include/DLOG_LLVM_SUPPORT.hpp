@@ -8,7 +8,7 @@
 #ifndef DLOG_LLVM_SUPPORT_HPP_
 #define DLOG_LLVM_SUPPORT_HPP_
 
-#include "includellvm.h"
+#include "includellvm.hpp"
 #include "DLOG_HELPER.hpp"
 
 

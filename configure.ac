@@ -25,16 +25,40 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_MKDIR_P
 
+AC_CHECK_PROG(SED,sed,sed)
+
+LLVM_CONFIG_CMD="llvm-config"
+LLVM_PREFIX=""
+
+AC_ARG_WITH(llvm-prefix,
+            AC_HELP_STRING([--with-llvm-prefix=DIR],
+                           [DIR Location of llvm-config]),
+                           [LLVM_PREFIX="$withval"
+			    LLVM_CONFIG_CMD="$LLVM_PREFIX/llvm-config"
+			    EN_LLVM=true
+                            ])
+
 
 #shared libary
 LT_INIT
 
 AC_ARG_ENABLE([llvm-support],
-    [AS_HELP_STRING([--enable-llvm-support], [Enable llvm support])],[EN_LLVM=true],[EN_LLVM=false])
+    [AS_HELP_STRING([--enable-llvm-support], [Enable llvm support])],
+    [EN_LLVM=true],
+    [EN_LLVM=false])
 
-AS_IF([test x$EN_LLVM = xtrue ],
-       [echo "LLVM support is enabled";
-	AM_CONDITIONAL(EN_LLVM,[true])], [AM_CONDITIONAL(EN_LLVM,[false])])
+AS_IF([x$EN_LLVM = xtrue ],
+      [AC_PATH_PROG([LLVM_CONFIG_F], [$LLVM_CONFIG_CMD])
+       ])
+
+AS_IF([[x$EN_LLVM = xtrue] && [x$LLVM_CONFIG_F = "x"] ],
+      AC_MSG_ERROR([llvm-config not found. check whether llvm_prefix contains correct value]),
+      [])
+AS_IF([x$EN_LLVM = xtrue ],
+       [echo "LLVM support is enabled"
+	AM_CONDITIONAL(EN_LLVM,[true])
+	CPPFLAGS="${CPPFLAGS} `${LLVM_CONFIG_CMD} --cxxflags`" ]
+	,[AM_CONDITIONAL(EN_LLVM,[false])])
 
 #AC_SUBST_FILE ([EN_LLVM])
 

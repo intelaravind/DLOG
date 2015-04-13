@@ -14,6 +14,8 @@
 
 @SET_MAKE@
 
+#Author Aravind
+
 VPATH = @srcdir@
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
 am__make_running_with_option = \
@@ -233,6 +235,7 @@ LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
+LLVM_CONFIG_F = @LLVM_CONFIG_F@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
@@ -313,6 +316,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 @EN_LLVM_FALSE@AM_CPPFLAGS = -std=c++11 -O3 -I$(top_srcdir)/include \
 @EN_LLVM_FALSE@	#-g
+
+#set by autoconf
 @EN_LLVM_TRUE@AM_CPPFLAGS = -DDLOG_LLVM_ENABLE -std=c++11 -O3 \
 @EN_LLVM_TRUE@	-I$(top_srcdir)/include #-g
 ACLOCAL_AMFLAGS = -I m4
