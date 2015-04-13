@@ -1,5 +1,5 @@
 
-AM_CPPFLAGS=-std=c++11 -O3 -I$(top_srcdir)/include -I$(top_srcdir)/#-g
+AM_CPPFLAGS=-std=c++11 -O3 -I$(top_srcdir)/include #-g
 ACLOCAL_AMFLAGS=-I m4
 
 #Fix me

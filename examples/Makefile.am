@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 
-AM_CPPFLAGS=-std=c++11 -O3 -I$(top_srcdir)/include -I$(top_srcdir)/#-g
+AM_CPPFLAGS=-std=c++11 -O3 -I$(top_srcdir)/include #-g
 
 LDADD = ../.libs/libDLOG.a
 

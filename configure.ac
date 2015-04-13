@@ -4,8 +4,8 @@
 AC_PREREQ([2.69])
 AC_INIT([DLOG], [0.6], [aravind_sr@outlook.com])
 AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Werror])
-AC_CONFIG_SRCDIR([config.h.in])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_SRCDIR([include/config.h.in])
+AC_CONFIG_HEADERS([include/config.h])
 
 
 #M4
@@ -22,7 +22,7 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-
+AC_PROG_MKDIR_P
 
 AC_PROG_RANLIB
 

@@ -595,7 +595,7 @@ PACKAGE_STRING='DLOG 0.6'
 PACKAGE_BUGREPORT='aravind_sr@outlook.com'
 PACKAGE_URL=''
 
-ac_unique_file="config.h.in"
+ac_unique_file="include/config.h.in"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -2999,8 +2999,7 @@ END
   fi
 fi
 
-
-ac_config_headers="$ac_config_headers config.h"
+ac_config_headers="$ac_config_headers include/config.h"
 
 
 
@@ -17722,7 +17721,7 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
+    "include/config.h") CONFIG_HEADERS="$CONFIG_HEADERS include/config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
