@@ -22,12 +22,21 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_RANLIB
 AC_PROG_MKDIR_P
 
-AC_PROG_RANLIB
 
 #shared libary
 LT_INIT
+
+AC_ARG_ENABLE([llvm-support],
+    [AS_HELP_STRING([--enable-llvm-support], [Enable llvm support])],[EN_LLVM=true],[EN_LLVM=false])
+
+AS_IF([test x$EN_LLVM = xtrue ],
+       [echo "LLVM support is enabled";
+	AM_CONDITIONAL(EN_LLVM,[true])], [AM_CONDITIONAL(EN_LLVM,[false])])
+
+#AC_SUBST_FILE ([EN_LLVM])
 
 #find the build path
 src_full_path=`cd $srcdir && pwd`

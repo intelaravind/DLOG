@@ -636,6 +636,8 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+EN_LLVM_FALSE
+EN_LLVM_TRUE
 CXXCPP
 OTOOL64
 OTOOL
@@ -767,6 +769,7 @@ enable_fast_install
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
+enable_llvm_support
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1410,6 +1413,7 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --enable-llvm-support   Enable llvm support
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -5723,8 +5727,6 @@ $as_echo "no" >&6; }
   SET_MAKE="MAKE=${MAKE-make}"
 fi
 
-
-
 if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}ranlib", so it can be a program name with args.
 set dummy ${ac_tool_prefix}ranlib; ac_word=$2
@@ -5816,6 +5818,8 @@ esac
 else
   RANLIB="$ac_cv_prog_RANLIB"
 fi
+
+
 
 
 #shared libary
@@ -16468,6 +16472,37 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+# Check whether --enable-llvm-support was given.
+if test "${enable_llvm_support+set}" = set; then :
+  enableval=$enable_llvm_support; EN_LLVM=true
+else
+  EN_LLVM=false
+fi
+
+
+if test x$EN_LLVM = xtrue ; then :
+  echo "LLVM support is enabled";
+	 if true; then
+  EN_LLVM_TRUE=
+  EN_LLVM_FALSE='#'
+else
+  EN_LLVM_TRUE='#'
+  EN_LLVM_FALSE=
+fi
+
+else
+   if false; then
+  EN_LLVM_TRUE=
+  EN_LLVM_FALSE='#'
+else
+  EN_LLVM_TRUE='#'
+  EN_LLVM_FALSE=
+fi
+
+fi
+
+#AC_SUBST_FILE ([EN_LLVM])
+
 #find the build path
 src_full_path=`cd $srcdir && pwd`
 
@@ -16752,6 +16787,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${EN_LLVM_TRUE}" && test -z "${EN_LLVM_FALSE}"; then
+  as_fn_error $? "conditional \"EN_LLVM\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${EN_LLVM_TRUE}" && test -z "${EN_LLVM_FALSE}"; then
+  as_fn_error $? "conditional \"EN_LLVM\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
