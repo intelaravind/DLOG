@@ -16586,8 +16586,6 @@ fi
 fi
 if test "$EN_LLVM" = true ; then :
   echo "LLVM support is enabled"
-	echo "$EN_LLVM"
-	echo "$LLVM_CONFIG_F"
 	 if true; then
   EN_LLVM_TRUE=
   EN_LLVM_FALSE='#'

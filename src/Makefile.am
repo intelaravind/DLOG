@@ -18,3 +18,6 @@ sources= DLOG.cpp DLOG_HELPER.cpp
 
 lib_LTLIBRARIES= $(top_builddir)/libDLOG.la
 __top_builddir__libDLOG_la_SOURCES = $(sources)
+
+bin_PROGRAMS = $(top_builddir)/DLOG_FINALIZER
+__top_builddir__DLOG_FINALIZER_SOURCES = DLOG_FINALIZER.cpp
