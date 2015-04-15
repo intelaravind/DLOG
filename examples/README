@@ -1,0 +1,15 @@
+In this file you will find some informations and tips
+Most of the library is covered in examples. Each example is targeted to show a specific feature of DLOG
+On each file you will find the example and required comments
+Output of each example will either be on output directory or dlog_output director depending on the configuration on each file
+Note that make command can be used to rebuild executables if the examples are modified
+
+In the .libs folder (TOP_DIR/.libs) you can find the libraries
+Shared and static are present there
+
+Compile flags are set by autoconf
+Read configure --help for options
+Autoreconf should be executed if the configure script is not working
+Zipping/compressing/packing of all the DLOG can be done using make dist
+You can report any error/suggestion/modifications at aravind_sr@outlook.com
+
