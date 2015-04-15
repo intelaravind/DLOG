@@ -124,7 +124,7 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 __top_builddir__libDLOG_la_LIBADD =
-am__objects_1 = DLOG.lo DLOG_HELPER.lo DLOG_FINALIZER.lo
+am__objects_1 = DLOG.lo DLOG_HELPER.lo
 am___top_builddir__libDLOG_la_OBJECTS = $(am__objects_1)
 __top_builddir__libDLOG_la_OBJECTS =  \
 	$(am___top_builddir__libDLOG_la_OBJECTS)
@@ -323,7 +323,7 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
 
 #CPPFLAGS+=$(shell llvm-config --cxxflags) -DDLOG_LLVM_ENABLE
-sources = DLOG.cpp DLOG_HELPER.cpp DLOG_FINALIZER.cpp
+sources = DLOG.cpp DLOG_HELPER.cpp 
 
 #noinst_LIBRARIES = $(top_builddir)/libs/libDLOG.a
 #__top_builddir__libs_libDLOG_a_SOURCES = $(sources)
@@ -412,7 +412,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DLOG.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DLOG_FINALIZER.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DLOG_HELPER.Plo@am__quote@
 
 .cpp.o:

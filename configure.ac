@@ -28,7 +28,7 @@ AC_PROG_MKDIR_P
 AC_CHECK_PROG(SED,sed,sed)
 
 LLVM_CONFIG_CMD="llvm-config"
-LLVM_PREFIX=""
+LLVM_PREFIX=$PATH
 
 AC_ARG_WITH(llvm-prefix,
             AC_HELP_STRING([--with-llvm-prefix=DIR],
@@ -47,14 +47,14 @@ AC_ARG_ENABLE([llvm-support],
     [EN_LLVM=true],
     [EN_LLVM=false])
 
-AS_IF([x$EN_LLVM = xtrue ],
-      [AC_PATH_PROG([LLVM_CONFIG_F], [$LLVM_CONFIG_CMD])
+AS_IF([test "$EN_LLVM" = true ],
+      [AC_PATH_PROG([LLVM_CONFIG_F], [llvm-config],[false],$LLVM_PREFIX)
        ])
 
-AS_IF([[x$EN_LLVM = xtrue] && [x$LLVM_CONFIG_F = "x"] ],
-      AC_MSG_ERROR([llvm-config not found. check whether llvm_prefix contains correct value]),
+AS_IF([test $EN_LLVM = true],
+      AS_IF([ test $LLVM_CONFIG_F = false],[AC_MSG_ERROR([llvm-config not found. check whether llvm_prefix contains correct value])]),
       [])
-AS_IF([x$EN_LLVM = xtrue ],
+AS_IF([test "$EN_LLVM" = true ],
        [echo "LLVM support is enabled"
 	AM_CONDITIONAL(EN_LLVM,[true])
 	CPPFLAGS="${CPPFLAGS} `${LLVM_CONFIG_CMD} --cxxflags`" ]

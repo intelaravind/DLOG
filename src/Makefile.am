@@ -11,7 +11,7 @@ ACLOCAL_AMFLAGS=-I m4
 
 #CPPFLAGS+=$(shell llvm-config --cxxflags) -DDLOG_LLVM_ENABLE
 
-sources= DLOG.cpp DLOG_HELPER.cpp DLOG_FINALIZER.cpp
+sources= DLOG.cpp DLOG_HELPER.cpp 
 
 #noinst_LIBRARIES = $(top_builddir)/libs/libDLOG.a
 #__top_builddir__libs_libDLOG_a_SOURCES = $(sources)

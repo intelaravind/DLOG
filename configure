@@ -5863,7 +5863,7 @@ fi
 
 
 LLVM_CONFIG_CMD="llvm-config"
-LLVM_PREFIX=""
+LLVM_PREFIX=$PATH
 
 
 # Check whether --with-llvm-prefix was given.
@@ -16534,9 +16534,9 @@ else
 fi
 
 
-if x$EN_LLVM = xtrue ; then :
-  # Extract the first word of "$LLVM_CONFIG_CMD", so it can be a program name with args.
-set dummy $LLVM_CONFIG_CMD; ac_word=$2
+if test "$EN_LLVM" = true ; then :
+  # Extract the first word of "llvm-config", so it can be a program name with args.
+set dummy llvm-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
 if ${ac_cv_path_LLVM_CONFIG_F+:} false; then :
@@ -16548,7 +16548,7 @@ else
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
+for as_dir in $LLVM_PREFIX
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
@@ -16562,6 +16562,7 @@ done
   done
 IFS=$as_save_IFS
 
+  test -z "$ac_cv_path_LLVM_CONFIG_F" && ac_cv_path_LLVM_CONFIG_F="false"
   ;;
 esac
 fi
@@ -16578,11 +16579,15 @@ fi
 
 fi
 
-if x$EN_LLVM = xtrue && x$LLVM_CONFIG_F = "x" ; then :
+if test $EN_LLVM = true; then :
+  if  test $LLVM_CONFIG_F = false; then :
   as_fn_error $? "llvm-config not found. check whether llvm_prefix contains correct value" "$LINENO" 5
 fi
-if x$EN_LLVM = xtrue ; then :
+fi
+if test "$EN_LLVM" = true ; then :
   echo "LLVM support is enabled"
+	echo "$EN_LLVM"
+	echo "$LLVM_CONFIG_F"
 	 if true; then
   EN_LLVM_TRUE=
   EN_LLVM_FALSE='#'
