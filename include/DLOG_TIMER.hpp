@@ -131,7 +131,9 @@ public:
         events.push_back(event);
         started.erase(begin);
 
+	long secs = (event.end.tv_sec - event.begin.tv_sec) * 1000000;
         mut.unlock();
+	return secs;
     }
 
     void reset()
