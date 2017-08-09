@@ -73,5 +73,6 @@ examples/pie_graph
 examples/pie_timer_graph_advanced
 examples/pie_timer_graph_simple
 examples/simple_timer
+examples/gantt_example
 recover.sh
 

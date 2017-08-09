@@ -1,1 +1,1 @@
-/usr/share/aclocal/lt~obsolete.m4
+/home/aravind/anaconda3/share/aclocal/lt~obsolete.m4

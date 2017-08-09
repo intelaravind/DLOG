@@ -4,7 +4,7 @@ AM_CPPFLAGS=-std=c++11 -O3 -I$(top_srcdir)/include #-g
 
 LDADD = ../.libs/libDLOG.a
 
-bin_PROGRAMS = bar_graph bar_graph_multiple bar_graph_multiple_table bar_graph_table_map dlog_simple dlog_simple_crash dlog_table_map_simple dlog_table_map_simple_multiple pie_graph pie_timer_graph_advanced pie_timer_graph_simple simple_timer dlog_table_simple dlog_table_simple2_multiple
+bin_PROGRAMS = bar_graph bar_graph_multiple bar_graph_multiple_table bar_graph_table_map dlog_simple dlog_simple_crash dlog_table_map_simple dlog_table_map_simple_multiple pie_graph pie_timer_graph_advanced pie_timer_graph_simple simple_timer dlog_table_simple dlog_table_simple2_multiple gantt_example
 
 bar_graph_SOURCES = bar_graph.cpp
 
@@ -33,3 +33,5 @@ pie_timer_graph_advanced_SOURCES = pie_timer_graph_advanced.cpp
 pie_timer_graph_simple_SOURCES = pie_timer_graph_simple.cpp
 
 simple_timer_SOURCES = simple_timer.cpp
+
+gantt_example_SOURCES = gantt_example.cpp

@@ -254,14 +254,8 @@ public:
 	std::string path = DLOG_NS::get_path(inpath);
 
         DLOG_TABLE table(filename, tablename, path.c_str());
-        std::vector < std::string > head_row;
-
-	head_row.push_back("Info");
-        head_row.push_back("Event");
-        head_row.push_back("Begin");
-        head_row.push_back("End");
-
-        std::map<std::string, int> occurrences;
+        
+	std::map<std::string, int> occurrences;
 
         for (event_t &event : events)
             occurrences[event.name] = 0;
